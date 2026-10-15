@@ -14,6 +14,10 @@ import router from '@adonisjs/core/services/router'
 router.on('/').render('pages/home').as('home')
 
 router
+    .get('email/confirm/:token', [controllers.EmailConfirmations, 'handle'])
+  .as('email.confirm')
+
+router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
     router.post('signup', [controllers.NewAccount, 'store'])
