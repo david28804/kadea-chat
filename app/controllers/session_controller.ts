@@ -18,12 +18,18 @@ export default class SessionController {
   /**
    * Authenticate user credentials and create a new session
    */
-  async store({ request, auth, response }: HttpContext) {
+  async store({ request, auth, response, session }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
     const user = await User.verifyCredentials(email, password)
 
+    // Refuse la connexion tant que l'e-mail n'est pas confirmé
+    if (!user.emailVerifiedAt) {
+      session.flash('error', "Confirmez d'abord votre adresse e-mail (vérifiez votre boîte de réception).")
+      return response.redirect().toRoute('session.create')
+    }
+
     await auth.use('web').login(user)
-    response.redirect().toRoute('dashboard')
+    return response.redirect().toRoute('dashboard')
   }
 
   /**
@@ -31,6 +37,6 @@ export default class SessionController {
    */
   async destroy({ auth, response }: HttpContext) {
     await auth.use('web').logout()
-    response.redirect().toRoute('session.create')
+    return response.redirect().toRoute('session.create')
   }
 }
