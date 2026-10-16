@@ -1,17 +1,40 @@
-@layouts.app({ title: 'Dashboard' })
-  @page()
-    <div class="empty">
-      <div class="empty__mark">
-        @svg('lucide:layout-grid', { width: 22, height: 22 })
+@layouts.app({ title: 'Conversations' })
+  <div class="chatapp">
+    <aside class="convlist">
+      <div class="convlist__head">
+        <h1 class="convlist__title">Kadea Chat</h1>
       </div>
-      <h1>Your dashboard is ready</h1>
-      <p>
-        It's empty on purpose. A clean starting point with nothing to undo. Add your first route and component to begin.
-      </p>
-      <p class="mono" style="font-size: 12.5px; color: var(--subtle); margin-top: 4px;">
-        Start in
-        <span class="kbd">resources/views/pages/dashboard.edge</span>
-      </p>
-    </div>
-  @end
+
+      <div class="convlist__body">
+        @if(conversations.length)
+          @each(conversation in conversations)
+            <a href="#" class="conv">
+              <span class="conv__avatar {{ conversation.isGroup ? 'conv__avatar--group' : '' }}">
+                {{ conversation.initials }}
+              </span>
+              <span class="conv__body">
+                <span class="conv__row">
+                  <span class="conv__name">{{ conversation.title }}</span>
+                  <span class="conv__time">{{ conversation.time }}</span>
+                </span>
+                <span class="conv__preview">{{ conversation.preview }}</span>
+              </span>
+            </a>
+          @end
+        @else
+          <p class="convlist__empty">Aucune conversation pour le moment.</p>
+        @end
+      </div>
+    </aside>
+
+    <section class="chatpane">
+      <div class="empty">
+        <div class="empty__mark">
+          @svg('lucide:message-circle', { width: 22, height: 22 })
+        </div>
+        <h1>Vos conversations commencent ici</h1>
+        <p>Sélectionnez une conversation dans la liste pour afficher vos messages.</p>
+      </div>
+    </section>
+  </div>
 @end

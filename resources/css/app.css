@@ -1,6 +1,6 @@
 /* ==========================================================================
-   AdonisJS Starter Kit
-   Tokens are the only thing you need to touch to re-theme.
+   Kadea Chat — styles
+   Les couleurs (tokens) sont les seules choses à modifier pour changer le thème.
    ========================================================================== */
 
 :root {
@@ -8,19 +8,20 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
   --serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
-  --paper: #f5f5f6;
+  /* Thème clair : gris et blanc */
+  --paper: #f5f5f5;
   --card: #ffffff;
-  --ink: #0a0a0b;
-  --ink-2: #2a2c30;
-  --muted: #6b6f76;
-  --subtle: #a4a8af;
-  --line: #ededee;
-  --line-2: #dddfe2;
-  --btn: #0a0a0b;
+  --ink: #141414;
+  --ink-2: #2a2a2a;
+  --muted: #6b6b6b;
+  --subtle: #a3a3a3;
+  --line: #ebebeb;
+  --line-2: #d4d4d4;
+  --btn: #202020;
   --btn-fg: #ffffff;
-  --ring: rgba(10, 10, 11, 0.13);
+  --ring: rgba(32, 32, 32, 0.15);
   --field: #ffffff;
-  --ok: #18794e;
+  --ok: #202020;
 
   --r: 8px;
   --r-lg: 14px;
@@ -28,19 +29,20 @@
 }
 
 :root[data-theme='dark'] {
-  --paper: #08080a;
-  --card: #111114;
-  --ink: #ededee;
-  --ink-2: #c4c6ca;
-  --muted: #8b8f97;
-  --subtle: #585c64;
-  --line: #1e1f23;
-  --line-2: #2c2e33;
-  --btn: #ededee;
-  --btn-fg: #0a0a0b;
-  --ring: rgba(237, 237, 238, 0.14);
-  --field: #0c0c0f;
-  --ok: #3ecf8e;
+  /* Thème sombre : gris, blanc, textes blancs */
+  --paper: #090909;
+  --card: rgba(255, 255, 255, 0.05);
+  --ink: #ffffff;
+  --ink-2: #e5e5e5;
+  --muted: #d1cacd;
+  --subtle: #a3a3a3;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-2: rgba(255, 255, 255, 0.18);
+  --btn: #ffffff;
+  --btn-fg: #090909;
+  --ring: rgba(255, 255, 255, 0.2);
+  --field: #151515;
+  --ok: #ffffff;
   color-scheme: dark;
 }
 
@@ -923,4 +925,292 @@ input {
   .panel {
     padding: 20px;
   }
+}
+
+/* ==========================================================================
+   Thème sombre : fond en dégradé gris (placé en dernier pour l'emporter)
+   ========================================================================== */
+:root[data-theme='dark'] body {
+  background: linear-gradient(135deg, #424242 0%, #202020 50%, #090909 100%) fixed;
+}
+:root[data-theme='dark'] .app-main,
+:root[data-theme='dark'] .auth__aside {
+  background: transparent;
+}
+:root[data-theme='dark'] .alert {
+  background: #1c1c1c;
+}
+
+
+/* ==========================================================================
+   Messagerie : barre de navigation verticale
+   ========================================================================== */
+.shell {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+}
+.shell__main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 0;
+  background: var(--card);
+  border-right: 1px solid var(--line);
+}
+.rail__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--btn);
+  color: var(--btn-fg);
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+.rail__item {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.rail__item:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+.rail__item[aria-current='page'] {
+  background: var(--line-2);
+  color: var(--ink);
+}
+.rail__bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.rail__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--line-2);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Mobile : la barre passe en bas de l'écran */
+@media (max-width: 760px) {
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) 60px;
+  }
+  .rail {
+    order: 2;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0 8px;
+    border-right: 0;
+    border-top: 1px solid var(--line);
+  }
+  .rail__logo {
+    display: none;
+  }
+  .rail__bottom {
+    margin-top: 0;
+    flex-direction: row;
+  }
+}
+
+/* ==========================================================================
+   Messagerie : liste des conversations et zone de discussion
+   ========================================================================== */
+.shell__main {
+  overflow: hidden;
+}
+.chatapp {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+.convlist {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--card);
+  border-right: 1px solid var(--line);
+}
+.convlist__head {
+  padding: 18px 18px 12px;
+}
+.convlist__title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.convlist__body {
+  flex: 1;
+  overflow-y: auto;
+}
+.convlist__empty {
+  padding: 24px 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.conv {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.conv:hover {
+  background: var(--line);
+}
+.conv__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--line-2);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 15px;
+}
+.conv__avatar--group {
+  border-radius: 12px;
+}
+.conv__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.conv__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+.conv__name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.conv__time {
+  font-size: 12px;
+  color: var(--muted);
+  flex: none;
+}
+.conv__preview {
+  font-size: 13.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chatpane {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 760px) {
+  .chatapp {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .chatpane {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Nouvelle conversation
+   ========================================================================== */
+.convlist__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.newconv {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 20px;
+}
+.newconv__inner {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.newconv__back {
+  font-size: 13.5px;
+}
+.newconv__title {
+  margin-top: 16px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.newconv__sub {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14.5px;
+}
+.newconv__search {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.newconv__search .field__input {
+  flex: 1;
+  min-width: 0;
+}
+.newconv__list {
+  margin-top: 16px;
+}
+.person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.person:hover {
+  background: var(--line);
+}
+.person__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
