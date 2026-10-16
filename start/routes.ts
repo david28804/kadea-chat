@@ -14,7 +14,7 @@ import router from '@adonisjs/core/services/router'
 router.on('/').render('pages/home').as('home')
 
 router
-    .get('email/confirm/:token', [controllers.EmailConfirmations, 'handle'])
+  .get('email/confirm/:token', [controllers.EmailConfirmations, 'handle'])
   .as('email.confirm')
 
 router
@@ -24,6 +24,13 @@ router
 
     router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store'])
+
+    router.get('forgot-password', [controllers.PasswordResets, 'create']).as('password.forgot')
+    router.post('forgot-password', [controllers.PasswordResets, 'store']).as('password.store')
+    router.get('reset-password/:token', [controllers.PasswordResets, 'edit']).as('password.edit')
+    router
+      .post('reset-password/:token', [controllers.PasswordResets, 'update'])
+      .as('password.update')
   })
   .use(middleware.guest())
 

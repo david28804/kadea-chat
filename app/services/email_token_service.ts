@@ -47,4 +47,21 @@ export default class EmailTokenService {
         `)
     })
   }
+
+  static async sendReset(user: User) {
+    const token = await this.create(user, 'reset', 60)
+    const url = `${env.get('APP_URL')}/reset-password/${token}`
+
+    await mail.send((message) => {
+      message
+        .to(user.email)
+        .subject('Réinitialisation de votre mot de passe - Kadea Chat')
+        .html(`
+          <h2>Bonjour ${user.fullName ?? ''},</h2>
+          <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.</p>
+          <p><a href="${url}" style="display:inline-block;padding:12px 20px;background:#0f766e;color:#fff;border-radius:8px;text-decoration:none">Choisir un nouveau mot de passe</a></p>
+          <p>Ce lien est valable 1 heure. Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail.</p>
+        `)
+    })
+  }
 }

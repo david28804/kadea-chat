@@ -26,6 +26,11 @@
       })
       @!field.error()
     @end
+    <p class="auth__foot" style="text-align: right; margin: 0;">
+      @link({ route: 'password.forgot', class: 'il' })
+        Mot de passe oublié ?
+      @end
+    </p>
     @!button({
       text: 'Sign in',
       type: 'submit',
@@ -37,11 +42,7 @@
   @end
 
   <p class="auth__foot">
-    
-
     New here?
-
-
     @link({ route: 'new_account.create', class: 'il' })
       Create an account
     @end
