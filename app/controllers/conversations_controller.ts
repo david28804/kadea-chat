@@ -5,9 +5,6 @@ import Message from '#models/message'
 import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 
-/**
- * Transforme "David Mbiya" en "DM"
- */
 function initialsOf(name: string) {
   return name
     .split(' ')
@@ -17,9 +14,6 @@ function initialsOf(name: string) {
     .join('')
 }
 
-/**
- * "Aujourd'hui", "Hier" ou "15/10/2026"
- */
 function dayLabel(date: DateTime) {
   const now = DateTime.now()
   if (date.hasSame(now, 'day')) return "Aujourd'hui"
@@ -28,9 +22,6 @@ function dayLabel(date: DateTime) {
 }
 
 export default class ConversationsController {
-  /**
-   * Construit la liste des conversations d'un utilisateur (colonne de gauche)
-   */
   private async buildList(user: User) {
     const memberships = await ConversationMember.query()
       .where('userId', user.id)
@@ -80,9 +71,6 @@ export default class ConversationsController {
     return items
   }
 
-  /**
-   * Liste des conversations, sans conversation ouverte
-   */
   async index({ auth, view }: HttpContext) {
     const user = auth.getUserOrFail()
     const conversations = await this.buildList(user)
@@ -90,9 +78,6 @@ export default class ConversationsController {
     return view.render('pages/dashboard', { conversations, active: null, messages: [] })
   }
 
-  /**
-   * Ouvre une conversation : liste à gauche, messages à droite
-   */
   async show({ auth, params, view, response }: HttpContext) {
     const user = auth.getUserOrFail()
     const id = Number(params.id)
@@ -101,7 +86,6 @@ export default class ConversationsController {
       return response.notFound('Conversation introuvable')
     }
 
-    // L'utilisateur doit être membre de cette conversation
     const membership = await ConversationMember.query()
       .where('conversationId', id)
       .where('userId', user.id)
@@ -128,7 +112,6 @@ export default class ConversationsController {
       subtitle: conversation.isGroup ? `${conversation.members.length} membres` : (other?.user.email ?? ''),
     }
 
-    // Les 200 derniers messages, du plus ancien au plus récent
     const rows = await Message.query()
       .where('conversationId', id)
       .preload('sender')
@@ -154,7 +137,6 @@ export default class ConversationsController {
       }
     })
 
-    // Marque la conversation comme lue
     membership.lastReadAt = DateTime.now()
     await membership.save()
 
@@ -163,9 +145,6 @@ export default class ConversationsController {
     return view.render('pages/dashboard', { conversations, active, messages })
   }
 
-  /**
-   * Page "Nouvelle conversation" : liste des utilisateurs, avec recherche
-   */
   async create({ auth, request, view }: HttpContext) {
     const me = auth.getUserOrFail()
     const q = String(request.input('q', '')).trim()
@@ -189,9 +168,6 @@ export default class ConversationsController {
     return view.render('pages/conversations/new', { people, q })
   }
 
-  /**
-   * Crée la conversation privée avec l'utilisateur choisi (ou réutilise l'existante)
-   */
   async store({ auth, request, response, session }: HttpContext) {
     const me = auth.getUserOrFail()
     const otherId = Number(request.input('userId'))
@@ -207,7 +183,6 @@ export default class ConversationsController {
       return response.redirect().toRoute('conversations.create')
     }
 
-    // Clé unique pour deux personnes, quel que soit l'ordre : "3-7"
     const directKey = `${Math.min(me.id, other.id)}-${Math.max(me.id, other.id)}`
 
     let conversation = await Conversation.findBy('directKey', directKey)
@@ -225,7 +200,6 @@ export default class ConversationsController {
       ])
     }
 
-    // On ouvre directement la conversation
     return response.redirect().toRoute('conversations.show', { id: conversation.id })
   }
 }

@@ -1345,3 +1345,16 @@ input {
     display: inline-grid;
   }
 }
+
+/* ==========================================================================
+   Groupes : cases à cocher
+   ========================================================================== */
+label.person {
+  cursor: pointer;
+}
+.person input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  accent-color: var(--btn);
+}

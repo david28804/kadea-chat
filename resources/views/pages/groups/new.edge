@@ -1,0 +1,36 @@
+@layouts.app({ title: 'Créer un groupe' })
+  <div class="newconv">
+    <div class="newconv__inner">
+      <a href="{{ route('dashboard') }}" class="il newconv__back">← Retour aux conversations</a>
+      <h1 class="newconv__title">Créer un groupe</h1>
+      <p class="newconv__sub">Donnez un nom au groupe et choisissez ses membres.</p>
+
+      @form({ route: 'groups.store', method: 'POST', class: 'auth__form' })
+        @field.root({ name: 'name' })
+          @!field.label({ text: 'Nom du groupe' })
+          @!input.control({ type: 'text', placeholder: 'Ex. Promo Kadea 2026' })
+          @!field.error()
+        @end
+
+        <div class="newconv__list">
+          @if(people.length)
+            @each(person in people)
+              <label class="person">
+                <input type="checkbox" name="members" value="{{ person.id }}" />
+                <span class="conv__avatar">{{ person.initials }}</span>
+                <span class="person__text">
+                  <span class="conv__name">{{ person.name }}</span>
+                  <span class="conv__preview">{{ person.email }}</span>
+                </span>
+              </label>
+            @end
+          @else
+            <p class="convlist__empty">Aucune personne disponible pour le moment.</p>
+          @end
+        </div>
+
+        @!button({ text: 'Créer le groupe', type: 'submit', block: true })
+      @end
+    </div>
+  </div>
+@end

@@ -4,6 +4,9 @@
       <a href="{{ route('dashboard') }}" class="il newconv__back">← Retour aux conversations</a>
       <h1 class="newconv__title">Nouvelle conversation</h1>
       <p class="newconv__sub">Choisissez une personne pour démarrer une discussion privée.</p>
+            <p style="margin-top: 10px;">
+        <a href="{{ route('groups.create') }}" class="btn btn--secondary btn--sm">Créer un groupe</a>
+      </p>
 
       <form method="GET" action="{{ route('conversations.create') }}" class="newconv__search">
         <input
