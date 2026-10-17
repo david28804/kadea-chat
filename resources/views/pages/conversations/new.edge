@@ -1,45 +1,42 @@
-@layouts.app({ title: 'Conversations' })
-  <div class="chatapp">
-    <aside class="convlist">
-      <div class="convlist__head">
-        <h1 class="convlist__title">Kadea Chat</h1>
-        <a href="{{ route('conversations.create') }}" class="btn btn--primary btn--sm">
-          @svg('lucide:plus', { width: 15, height: 15 })
-          Nouvelle
-        </a>
-      </div>
+@layouts.app({ title: 'Nouvelle conversation' })
+  <div class="newconv">
+    <div class="newconv__inner">
+      <a href="{{ route('dashboard') }}" class="il newconv__back">← Retour aux conversations</a>
+      <h1 class="newconv__title">Nouvelle conversation</h1>
+      <p class="newconv__sub">Choisissez une personne pour démarrer une discussion privée.</p>
 
-      <div class="convlist__body">
-        @if(conversations.length)
-          @each(conversation in conversations)
-            <a href="#" class="conv">
-              <span class="conv__avatar {{ conversation.isGroup ? 'conv__avatar--group' : '' }}">
-                {{ conversation.initials }}
-              </span>
-              <span class="conv__body">
-                <span class="conv__row">
-                  <span class="conv__name">{{ conversation.title }}</span>
-                  <span class="conv__time">{{ conversation.time }}</span>
+      <form method="GET" action="{{ route('conversations.create') }}" class="newconv__search">
+        <input
+          type="search"
+          name="q"
+          value="{{ q }}"
+          placeholder="Rechercher par nom ou e-mail…"
+          class="field__input"
+          aria-label="Rechercher une personne"
+        />
+        <button type="submit" class="btn btn--secondary">Rechercher</button>
+      </form>
+
+      <div class="newconv__list">
+        @if(people.length)
+          @each(person in people)
+            @form({ route: 'conversations.store', method: 'POST' })
+              <input type="hidden" name="userId" value="{{ person.id }}" />
+              <button type="submit" class="person">
+                <span class="conv__avatar">{{ person.initials }}</span>
+                <span class="person__text">
+                  <span class="conv__name">{{ person.name }}</span>
+                  <span class="conv__preview">{{ person.email }}</span>
                 </span>
-                <span class="conv__preview">{{ conversation.preview }}</span>
-              </span>
-            </a>
+              </button>
+            @end
           @end
         @else
-          <p class="convlist__empty">Aucune conversation pour le moment.</p>
+          <p class="convlist__empty">
+            Aucune personne trouvée. Une personne apparaît ici après avoir créé un compte et confirmé son e-mail.
+          </p>
         @end
       </div>
-    </aside>
-
-    <section class="chatpane">
-      <div class="empty">
-        <div class="empty__mark">
-          @svg('lucide:message-circle', { width: 22, height: 22 })
-        </div>
-        <h1>Vos conversations commencent ici</h1>
-        <p>Sélectionnez une conversation dans la liste, ou démarrez-en une nouvelle.</p>
-        <a href="{{ route('conversations.create') }}" class="btn btn--primary">Nouvelle conversation</a>
-      </div>
-    </section>
+    </div>
   </div>
 @end

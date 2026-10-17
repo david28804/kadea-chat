@@ -17,13 +17,21 @@ function initialsOf(name: string) {
     .join('')
 }
 
+/**
+ * "Aujourd'hui", "Hier" ou "15/10/2026"
+ */
+function dayLabel(date: DateTime) {
+  const now = DateTime.now()
+  if (date.hasSame(now, 'day')) return "Aujourd'hui"
+  if (date.hasSame(now.minus({ days: 1 }), 'day')) return 'Hier'
+  return date.toFormat('dd/MM/yyyy')
+}
+
 export default class ConversationsController {
   /**
-   * Liste des conversations de l'utilisateur connecté
+   * Construit la liste des conversations d'un utilisateur (colonne de gauche)
    */
-  async index({ auth, view }: HttpContext) {
-    const user = auth.getUserOrFail()
-
+  private async buildList(user: User) {
     const memberships = await ConversationMember.query()
       .where('userId', user.id)
       .preload('conversation', (conversation) => {
@@ -69,8 +77,90 @@ export default class ConversationsController {
     )
 
     items.sort((a, b) => b.sortKey - a.sortKey)
+    return items
+  }
 
-    return view.render('pages/dashboard', { conversations: items })
+  /**
+   * Liste des conversations, sans conversation ouverte
+   */
+  async index({ auth, view }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const conversations = await this.buildList(user)
+
+    return view.render('pages/dashboard', { conversations, active: null, messages: [] })
+  }
+
+  /**
+   * Ouvre une conversation : liste à gauche, messages à droite
+   */
+  async show({ auth, params, view, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const id = Number(params.id)
+
+    if (!Number.isInteger(id)) {
+      return response.notFound('Conversation introuvable')
+    }
+
+    // L'utilisateur doit être membre de cette conversation
+    const membership = await ConversationMember.query()
+      .where('conversationId', id)
+      .where('userId', user.id)
+      .preload('conversation', (conversation) => {
+        conversation.preload('members', (member) => member.preload('user'))
+      })
+      .first()
+
+    if (!membership) {
+      return response.notFound('Conversation introuvable')
+    }
+
+    const conversation = membership.conversation
+    const other = conversation.members.find((member) => member.userId !== user.id)
+    const title = conversation.isGroup
+      ? (conversation.name ?? 'Groupe')
+      : (other?.user.fullName ?? other?.user.email ?? 'Conversation')
+
+    const active = {
+      id: conversation.id,
+      title,
+      initials: initialsOf(title),
+      isGroup: conversation.isGroup,
+      subtitle: conversation.isGroup ? `${conversation.members.length} membres` : (other?.user.email ?? ''),
+    }
+
+    // Les 200 derniers messages, du plus ancien au plus récent
+    const rows = await Message.query()
+      .where('conversationId', id)
+      .preload('sender')
+      .orderBy('createdAt', 'desc')
+      .limit(200)
+    rows.reverse()
+
+    let previousDay = ''
+    const messages = rows.map((message) => {
+      const day = dayLabel(message.createdAt)
+      const showDay = day !== previousDay
+      previousDay = day
+
+      return {
+        id: message.id,
+        content: message.isDeleted ? null : message.content,
+        isDeleted: message.isDeleted,
+        isMine: message.senderId === user.id,
+        author: message.sender?.fullName ?? message.sender?.email ?? 'Utilisateur supprimé',
+        time: message.createdAt.toFormat('HH:mm'),
+        day,
+        showDay,
+      }
+    })
+
+    // Marque la conversation comme lue
+    membership.lastReadAt = DateTime.now()
+    await membership.save()
+
+    const conversations = await this.buildList(user)
+
+    return view.render('pages/dashboard', { conversations, active, messages })
   }
 
   /**
@@ -133,10 +223,9 @@ export default class ConversationsController {
         { conversationId: conversation.id, userId: me.id, role: 'member', joinedAt: DateTime.now() },
         { conversationId: conversation.id, userId: other.id, role: 'member', joinedAt: DateTime.now() },
       ])
-
-      session.flash('success', 'Conversation créée.')
     }
 
-    return response.redirect().toRoute('dashboard')
+    // On ouvre directement la conversation
+    return response.redirect().toRoute('conversations.show', { id: conversation.id })
   }
 }

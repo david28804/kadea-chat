@@ -1,14 +1,21 @@
-@layouts.app({ title: 'Conversations' })
-  <div class="chatapp">
+@layouts.app({ title: active ? active.title : 'Conversations' })
+  <div class="chatapp {{ active ? 'chatapp--open' : '' }}">
     <aside class="convlist">
       <div class="convlist__head">
         <h1 class="convlist__title">Kadea Chat</h1>
+        <a href="{{ route('conversations.create') }}" class="btn btn--primary btn--sm">
+          @svg('lucide:plus', { width: 15, height: 15 })
+          Nouvelle
+        </a>
       </div>
 
       <div class="convlist__body">
         @if(conversations.length)
           @each(conversation in conversations)
-            <a href="#" class="conv">
+            <a
+              href="{{ route('conversations.show', { id: conversation.id }) }}"
+              class="conv {{ active && active.id === conversation.id ? 'conv--active' : '' }}"
+            >
               <span class="conv__avatar {{ conversation.isGroup ? 'conv__avatar--group' : '' }}">
                 {{ conversation.initials }}
               </span>
@@ -28,13 +35,77 @@
     </aside>
 
     <section class="chatpane">
-      <div class="empty">
-        <div class="empty__mark">
-          @svg('lucide:message-circle', { width: 22, height: 22 })
+      @if(active)
+        <header class="chathead">
+          <a href="{{ route('dashboard') }}" class="iconbtn chathead__back" aria-label="Retour à la liste">
+            @svg('lucide:arrow-left', { width: 16, height: 16 })
+          </a>
+          <span class="conv__avatar {{ active.isGroup ? 'conv__avatar--group' : '' }}">
+            {{ active.initials }}
+          </span>
+          <span class="chathead__text">
+            <span class="conv__name">{{ active.title }}</span>
+            <span class="conv__preview">{{ active.subtitle }}</span>
+          </span>
+        </header>
+
+        <div class="msgs" x-data x-init="$el.scrollTop = $el.scrollHeight">
+          @if(messages.length)
+            @each(message in messages)
+              @if(message.showDay)
+                <div class="msgs__day">{{ message.day }}</div>
+              @end
+              <div class="msg {{ message.isMine ? 'msg--mine' : '' }}">
+                @if(active.isGroup && !message.isMine)
+                  <span class="msg__author">{{ message.author }}</span>
+                @end
+                @if(message.isDeleted)
+                  <span class="msg__deleted">Ce message a été supprimé</span>
+                @else
+                  <span class="msg__text">{{ message.content }}</span>
+                @end
+                <span class="msg__time">{{ message.time }}</span>
+              </div>
+            @end
+          @else
+            <p class="msgs__empty">Aucun message pour le moment. Écrivez le premier !</p>
+          @end
         </div>
-        <h1>Vos conversations commencent ici</h1>
-        <p>Sélectionnez une conversation dans la liste pour afficher vos messages.</p>
-      </div>
+
+        @form({
+          route: 'messages.store',
+          routeParams: { id: active.id },
+          method: 'POST',
+          class: 'composer',
+          'x-data': '{ submitting: false }',
+          'x-on:submit': 'submitting = true',
+        })
+          <textarea
+            name="content"
+            rows="1"
+            class="composer__input"
+            placeholder="Écrire un message…"
+            aria-label="Écrire un message"
+            autocomplete="off"
+            maxlength="2000"
+            required
+            x-on:keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); $el.form.requestSubmit() }"
+          ></textarea>
+          <button type="submit" class="btn btn--primary" x-bind:disabled="submitting">
+            @svg('lucide:send', { width: 15, height: 15 })
+            Envoyer
+          </button>
+        @end
+      @else
+        <div class="empty">
+          <div class="empty__mark">
+            @svg('lucide:message-circle', { width: 22, height: 22 })
+          </div>
+          <h1>Vos conversations commencent ici</h1>
+          <p>Sélectionnez une conversation dans la liste, ou démarrez-en une nouvelle.</p>
+          <a href="{{ route('conversations.create') }}" class="btn btn--primary">Nouvelle conversation</a>
+        </div>
+      @end
     </section>
   </div>
 @end

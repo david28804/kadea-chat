@@ -38,7 +38,9 @@ router
   .group(() => {
     router.get('/dashboard', [controllers.Conversations, 'index']).as('dashboard')
     router.get('/conversations/new', [controllers.Conversations, 'create']).as('conversations.create')
+    router.get('/conversations/:id', [controllers.Conversations, 'show']).as('conversations.show')
     router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
+    router.post('/conversations/:id/messages', [controllers.Messages, 'store']).as('messages.store')
     router.post('logout', [controllers.Session, 'destroy'])
   })
   .use(middleware.auth())
