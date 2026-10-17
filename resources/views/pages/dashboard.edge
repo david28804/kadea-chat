@@ -49,13 +49,20 @@
           </span>
         </header>
 
-        <div class="msgs" x-data x-init="$el.scrollTop = $el.scrollHeight">
+        <div
+          class="msgs"
+          data-conversation-id="{{ active.id }}"
+          data-user-id="{{ auth.user.id }}"
+          data-group="{{ active.isGroup ? '1' : '0' }}"
+          x-data
+          x-init="$el.scrollTop = $el.scrollHeight"
+        >
           @if(messages.length)
             @each(message in messages)
               @if(message.showDay)
                 <div class="msgs__day">{{ message.day }}</div>
               @end
-              <div class="msg {{ message.isMine ? 'msg--mine' : '' }}">
+              <div class="msg {{ message.isMine ? 'msg--mine' : '' }}" data-message-id="{{ message.id }}">
                 @if(active.isGroup && !message.isMine)
                   <span class="msg__author">{{ message.author }}</span>
                 @end
