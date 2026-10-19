@@ -1,5 +1,3 @@
-
-import './chat.js'
 import { Transmit } from '@adonisjs/transmit-client'
 
 // On cherche la zone des messages (elle n'existe que dans une conversation ouverte)
@@ -13,13 +11,24 @@ if (box) {
   const transmit = new Transmit({
     baseUrl: window.location.origin,
     onSubscribeFailed: (response) => {
-      console.error('Abonnement au temps réel refusé, code', response.status)
+      console.error('[temps réel] abonnement refusé, code', response.status)
+    },
+    onSubscription: (channel) => {
+      console.log('[temps réel] abonné au canal', channel)
+    },
+    onReconnectAttempt: (attempt) => {
+      console.warn('[temps réel] tentative de reconnexion n°', attempt)
     },
   })
+
+  transmit.on('connected', () => console.log('[temps réel] connecté'))
+  transmit.on('disconnected', () => console.warn('[temps réel] déconnecté'))
 
   const subscription = transmit.subscription(`conversations/${conversationId}`)
 
   subscription.onMessage((data) => {
+    console.log('[temps réel] message reçu', data)
+
     // Évite d'afficher deux fois le même message
     if (box.querySelector(`[data-message-id="${data.id}"]`)) return
 
@@ -53,6 +62,6 @@ if (box) {
   })
 
   subscription.create().catch((error) => {
-    console.error('Temps réel indisponible', error)
+    console.error('[temps réel] indisponible', error)
   })
 }

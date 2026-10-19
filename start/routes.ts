@@ -10,6 +10,14 @@
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
+import transmit from '@adonisjs/transmit/services/main'
+
+// Routes du temps réel (l'abonnement à un canal exige d'être connecté)
+transmit.registerRoutes((route) => {
+  if (route.getPattern() === '__transmit/subscribe') {
+    route.middleware(middleware.auth())
+  }
+})
 
 router.on('/').render('pages/home').as('home')
 

@@ -1,7 +1,9 @@
 import Conversation from '#models/conversation'
 import ConversationMember from '#models/conversation_member'
 import Message from '#models/message'
+import transmit from '@adonisjs/transmit/services/main'
 import vine from '@vinejs/vine'
+import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 
 const messageValidator = vine.compile(
@@ -34,7 +36,7 @@ export default class MessagesController {
 
     const { content } = await request.validateUsing(messageValidator)
 
-    await Message.create({
+    const message = await Message.create({
       conversationId: id,
       senderId: user.id,
       content,
@@ -45,6 +47,16 @@ export default class MessagesController {
     if (conversation) {
       await conversation.save()
     }
+
+    // Annonce le message à tous ceux qui écoutent cette conversation
+    console.log(`[temps réel] annonce du message ${message.id} sur conversations/${id}`)
+    transmit.broadcast(`conversations/${id}`, {
+      id: message.id,
+      senderId: user.id,
+      author: user.fullName ?? user.email,
+      content,
+      time: DateTime.now().toFormat('HH:mm'),
+    })
 
     return response.redirect().toRoute('conversations.show', { id })
   }
