@@ -1,6 +1,6 @@
 @layouts.auth()
-  <h1 class="auth__title">Create your account</h1>
-  <p class="auth__sub">Start building with the starter kit.</p>
+  <h1 class="auth__title">Créez votre compte</h1>
+  <p class="auth__sub">Rejoignez Kadea Chat et discutez avec votre équipe.</p>
   @form({
     route: 'new_account.store',
     method: 'POST',
@@ -9,21 +9,21 @@
     'x-on:submit': 'submitting = true',
   })
     @field.root({ name: 'fullName' })
-      @!field.label({ text: 'Full name' })
+      @!field.label({ text: 'Nom complet' })
       @!input.control({ autocomplete: 'name', placeholder: 'Ada Lovelace' })
       @!field.error()
     @end
     @field.root({ name: 'email' })
-      @!field.label({ text: 'Email' })
+      @!field.label({ text: 'Adresse e-mail' })
       @!input.control({
         type: 'email',
         autocomplete: 'email',
-        placeholder: 'you@example.com',
+        placeholder: 'vous@exemple.com',
       })
       @!field.error()
     @end
     @field.root({ name: 'password' })
-      @!field.label({ text: 'Password' })
+      @!field.label({ text: 'Mot de passe' })
       @!input.control({
         type: 'password',
         autocomplete: 'new-password',
@@ -32,7 +32,7 @@
       @!field.error()
     @end
     @field.root({ name: 'passwordConfirmation' })
-      @!field.label({ text: 'Confirm password' })
+      @!field.label({ text: 'Confirmer le mot de passe' })
       @!input.control({
         type: 'password',
         autocomplete: 'new-password',
@@ -41,21 +41,19 @@
       @!field.error()
     @end
     @!button({
-      text: 'Create account',
+      text: 'Créer mon compte',
       type: 'submit',
       block: true,
       style: 'margin-top: 4px;',
       'x-bind:disabled': 'submitting',
-      'x-text': "submitting ? 'One moment…' : 'Create account'",
+      'x-text': "submitting ? 'Un instant…' : 'Créer mon compte'",
     })
   @end
 
   <p class="auth__foot">
-    
-    Already have an account?
-
+    Vous avez déjà un compte ?
     @link({ route: 'session.create', class: 'il' })
-      Sign in
+      Se connecter
     @end
   </p>
 @end

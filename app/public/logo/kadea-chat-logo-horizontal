@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" width="520" height="128" role="img" aria-label="Kadea Chat">
+  <title>Kadea Chat</title>
+  <defs>
+    <mask id="kadea-k" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff"/>
+      <g transform="translate(-1.5 0)">
+        <rect x="19" y="13" width="7" height="30" fill="#000"/>
+        <path d="M45 15L34 28L45 41" fill="none" stroke="#000" stroke-width="7" stroke-linejoin="miter" stroke-miterlimit="10"/>
+      </g>
+    </mask>
+  </defs>
+  <path mask="url(#kadea-k)" fill="#202020" d="M18 4H46A14 14 0 0 1 60 18V38A14 14 0 0 1 46 52H30L18 62V52A14 14 0 0 1 4 38V18A14 14 0 0 1 18 4Z"/>
+  <text x="78" y="40" font-family="'Segoe UI', -apple-system, Roboto, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="-0.5" fill="#202020">Kadea Chat</text>
+</svg>

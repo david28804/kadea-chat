@@ -24,7 +24,24 @@
   <body>
     <div class="shell">
       <nav class="rail" aria-label="Navigation principale">
-        <a href="/" class="rail__logo" aria-label="Kadea Chat">K</a>
+        <a href="/" class="rail__logo" aria-label="Kadea Chat">
+          <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <mask id="rail-k" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+                <rect width="64" height="64" fill="#fff" />
+                <g transform="translate(-1.5 0)">
+                  <rect x="19" y="13" width="7" height="30" fill="#000" />
+                  <path d="M45 15L34 28L45 41" fill="none" stroke="#000" stroke-width="7" stroke-linejoin="miter" stroke-miterlimit="10" />
+                </g>
+              </mask>
+            </defs>
+            <path
+              mask="url(#rail-k)"
+              fill="currentColor"
+              d="M18 4H46A14 14 0 0 1 60 18V38A14 14 0 0 1 46 52H30L18 62V52A14 14 0 0 1 4 38V18A14 14 0 0 1 18 4Z"
+            />
+          </svg>
+        </a>
 
         @each(item in nav)
           @navLink({ route: item.route, class: 'rail__item' })
