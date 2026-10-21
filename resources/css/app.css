@@ -1686,3 +1686,14 @@ label.person {
   border: 2px solid var(--card);
 }
 
+
+/* ==========================================================================
+   « Est en train d'écrire »
+   ========================================================================== */
+.typing {
+  min-height: 22px;
+  padding: 2px 18px 4px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--muted);
+}

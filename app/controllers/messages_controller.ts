@@ -54,7 +54,7 @@ export default class MessagesController {
           .first()
 
         if (block) {
-          session.flash('error', "Vous ne pouvez pas envoyer de message dans cette conversation.")
+          session.flash('error', 'Vous ne pouvez pas envoyer de message dans cette conversation.')
           return response.redirect().toRoute('conversations.show', { id })
         }
       }
@@ -82,6 +82,35 @@ export default class MessagesController {
     })
 
     return response.redirect().toRoute('conversations.show', { id })
+  }
+
+  /**
+   * Annonce que l'utilisateur est en train d'écrire
+   */
+  async typing({ auth, params, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const id = Number(params.id)
+
+    if (!Number.isInteger(id)) {
+      return response.noContent()
+    }
+
+    const membership = await ConversationMember.query()
+      .where('conversationId', id)
+      .where('userId', user.id)
+      .first()
+
+    if (!membership) {
+      return response.notFound('Conversation introuvable')
+    }
+
+    transmit.broadcast(`conversations/${id}`, {
+      type: 'typing',
+      userId: user.id,
+      name: user.fullName ?? user.email,
+    })
+
+    return response.noContent()
   }
 
   /**
