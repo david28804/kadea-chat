@@ -76,7 +76,24 @@
                 @else
                   <span class="msg__text">{{ message.content }}</span>
                 @end
-                <span class="msg__time">{{ message.time }}</span>
+                <div class="msg__foot">
+                  @if(message.isMine && !message.isDeleted)
+                    <details class="msg__del">
+                      <summary aria-label="Supprimer le message" title="Supprimer">
+                        @svg('lucide:trash-2', { width: 13, height: 13 })
+                      </summary>
+                      @form({
+                        route: 'messages.destroy',
+                        routeParams: { id: message.id },
+                        method: 'POST',
+                      })
+                        <span>Supprimer ?</span>
+                        <button type="submit" class="msg__yes">Oui</button>
+                      @end
+                    </details>
+                  @end
+                  <span class="msg__time">{{ message.time }}</span>
+                </div>
               </div>
             @end
           @else

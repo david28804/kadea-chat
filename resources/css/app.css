@@ -1378,3 +1378,138 @@ label.person {
   display: grid;
   place-items: center;
 }
+
+/* ==========================================================================
+   Suppression d'un message
+   ========================================================================== */
+.msg {
+  position: relative;
+}
+.msg__delete-form {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.msg:hover .msg__delete-form,
+.msg__delete-form:focus-within {
+  opacity: 1;
+}
+.msg__delete {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+.msg__delete:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+@media (hover: none) {
+  .msg__delete-form {
+    opacity: 1;
+  }
+}
+
+
+/* Confirmation de suppression, dans la bulle */
+.msg__delete-form.is-open {
+  opacity: 1;
+}
+.msg__confirm form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--line-2);
+  font-size: 12px;
+}
+.msg__confirm-text {
+  color: var(--ink);
+}
+.msg__yes {
+  font-weight: 700;
+  color: var(--ink);
+}
+.msg__no {
+  color: var(--muted);
+}
+.msg__yes:hover,
+.msg__no:hover {
+  text-decoration: underline;
+}
+
+
+/* ==========================================================================
+   Suppression d'un message (version sans script)
+   ========================================================================== */
+.msg__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+.msg__foot .msg__time {
+  margin-top: 0;
+}
+.msg__del {
+  position: relative;
+}
+.msg__del summary {
+  list-style: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.msg__del summary::-webkit-details-marker {
+  display: none;
+}
+.msg__del summary:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+.msg:hover .msg__del summary,
+.msg__del[open] summary {
+  opacity: 1;
+}
+.msg__del form {
+  position: absolute;
+  right: 0;
+  bottom: 28px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--field);
+  border: 1px solid var(--line-2);
+  color: var(--ink);
+  font-size: 12px;
+  box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.4);
+}
+.msg__yes {
+  font-weight: 700;
+  color: var(--ink);
+}
+.msg__yes:hover {
+  text-decoration: underline;
+}
+@media (hover: none) {
+  .msg__del summary {
+    opacity: 1;
+  }
+}

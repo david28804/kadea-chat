@@ -24,7 +24,6 @@ export default class MessagesController {
       return response.notFound('Conversation introuvable')
     }
 
-    // Seuls les membres peuvent écrire dans la conversation
     const membership = await ConversationMember.query()
       .where('conversationId', id)
       .where('userId', user.id)
@@ -42,14 +41,13 @@ export default class MessagesController {
       content,
     })
 
-    // Garde la conversation à jour (pour le tri futur)
     const conversation = await Conversation.find(id)
     if (conversation) {
       await conversation.save()
     }
 
-    // Annonce le message à tous ceux qui écoutent cette conversation
     transmit.broadcast(`conversations/${id}`, {
+      type: 'new',
       id: message.id,
       senderId: user.id,
       author: user.fullName ?? user.email,
@@ -58,5 +56,40 @@ export default class MessagesController {
     })
 
     return response.redirect().toRoute('conversations.show', { id })
+  }
+
+  /**
+   * Supprime un message : seul son auteur peut le faire
+   */
+  async destroy({ auth, params, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const id = Number(params.id)
+
+    if (!Number.isInteger(id)) {
+      return response.notFound('Message introuvable')
+    }
+
+    const message = await Message.find(id)
+    if (!message) {
+      return response.notFound('Message introuvable')
+    }
+
+    if (message.senderId !== user.id) {
+      return response.forbidden('Vous ne pouvez supprimer que vos propres messages')
+    }
+
+    if (!message.isDeleted) {
+      message.deletedAt = DateTime.now()
+      message.content = null
+      await message.save()
+
+      // Prévient les autres personnes de la conversation
+      transmit.broadcast(`conversations/${message.conversationId}`, {
+        type: 'deleted',
+        id: message.id,
+      })
+    }
+
+    return response.redirect().toRoute('conversations.show', { id: message.conversationId })
   }
 }

@@ -13,20 +13,32 @@ if (box) {
     onSubscribeFailed: (response) => {
       console.error('[temps réel] abonnement refusé, code', response.status)
     },
-    onSubscription: (channel) => {
-      console.log('[temps réel] abonné au canal', channel)
-    },
-    onReconnectAttempt: (attempt) => {
-      console.warn('[temps réel] tentative de reconnexion n°', attempt)
-    },
   })
-
-  transmit.on('connected', () => console.log('[temps réel] connecté'))
-  transmit.on('disconnected', () => console.warn('[temps réel] déconnecté'))
 
   const subscription = transmit.subscription(`conversations/${conversationId}`)
 
   subscription.onMessage((data) => {
+    // Un message a été supprimé : on remplace son contenu
+    if (data.type === 'deleted') {
+      const bubble = box.querySelector(`[data-message-id="${data.id}"]`)
+      if (bubble) {
+        const text = bubble.querySelector('.msg__text')
+        if (text) text.remove()
+
+        const trash = bubble.querySelector('.msg__del')
+        if (trash) trash.remove()
+
+        if (!bubble.querySelector('.msg__deleted')) {
+          const note = document.createElement('span')
+          note.className = 'msg__deleted'
+          note.textContent = 'Ce message a été supprimé'
+          const anchor = bubble.querySelector('.msg__foot') || bubble.querySelector('.msg__time')
+          bubble.insertBefore(note, anchor)
+        }
+      }
+      return
+    }
+
     // Évite d'afficher deux fois le même message
     if (box.querySelector(`[data-message-id="${data.id}"]`)) return
 
@@ -50,10 +62,13 @@ if (box) {
     text.textContent = data.content
     bubble.appendChild(text)
 
+    const foot = document.createElement('div')
+    foot.className = 'msg__foot'
     const time = document.createElement('span')
     time.className = 'msg__time'
     time.textContent = data.time
-    bubble.appendChild(time)
+    foot.appendChild(time)
+    bubble.appendChild(foot)
 
     box.appendChild(bubble)
     box.scrollTop = box.scrollHeight
