@@ -3,7 +3,7 @@ import { Transmit } from '@adonisjs/transmit-client'
 // On cherche la zone des messages (elle n'existe que dans une conversation ouverte)
 const box = document.querySelector('[data-conversation-id]')
 
-if (box) {
+if (box && box.dataset.live === '1') {
   const conversationId = box.dataset.conversationId
   const myId = Number(box.dataset.userId)
   const isGroup = box.dataset.group === '1'

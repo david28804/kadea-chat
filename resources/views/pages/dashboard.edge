@@ -1,12 +1,27 @@
 @layouts.app({ title: active ? active.title : 'Conversations' })
   <div class="chatapp {{ active ? 'chatapp--open' : '' }}">
-    <aside class="convlist">
+    <aside
+      class="convlist"
+      x-data="{ q: '', f: 'all', ok(el) { const t = el.dataset.title.toLowerCase().includes(this.q.toLowerCase()); const g = this.f === 'all' || (this.f === 'unread' && Number(el.dataset.unread) > 0) || (this.f === 'groups' && el.dataset.group === '1'); return t && g } }"
+    >
       <div class="convlist__head">
         <h1 class="convlist__title">Kadea Chat</h1>
-        <a href="{{ route('conversations.create') }}" class="btn btn--primary btn--sm">
-          @svg('lucide:plus', { width: 15, height: 15 })
-          Nouvelle
-        </a>
+      </div>
+
+      <div class="convlist__search">
+        <input
+          type="search"
+          class="field__input"
+          placeholder="Rechercher une conversation…"
+          aria-label="Rechercher une conversation"
+          x-model="q"
+        />
+      </div>
+
+      <div class="convfilters">
+        <button type="button" x-on:click="f = 'all'" x-bind:aria-pressed="f === 'all'">Toutes</button>
+        <button type="button" x-on:click="f = 'unread'" x-bind:aria-pressed="f === 'unread'">Non lues</button>
+        <button type="button" x-on:click="f = 'groups'" x-bind:aria-pressed="f === 'groups'">Groupes</button>
       </div>
 
       <div class="convlist__body">
@@ -15,6 +30,10 @@
             <a
               href="{{ route('conversations.show', { id: conversation.id }) }}"
               class="conv {{ active && active.id === conversation.id ? 'conv--active' : '' }}"
+              data-title="{{ conversation.title }}"
+              data-group="{{ conversation.isGroup ? '1' : '0' }}"
+              data-unread="{{ conversation.unread }}"
+              x-show="ok($el)"
             >
               <span class="conv__avatar {{ conversation.isGroup ? 'conv__avatar--group' : '' }}">
                 {{ conversation.initials }}
@@ -37,6 +56,13 @@
           <p class="convlist__empty">Aucune conversation pour le moment.</p>
         @end
       </div>
+
+      <div class="convlist__foot">
+        <a href="{{ route('conversations.create') }}" class="btn btn--primary">
+          @svg('lucide:plus', { width: 15, height: 15 })
+          Nouvelle conversation
+        </a>
+      </div>
     </aside>
 
     <section class="chatpane">
@@ -52,13 +78,55 @@
             <span class="conv__name">{{ active.title }}</span>
             <span class="conv__preview">{{ active.subtitle }}</span>
           </span>
+          <div class="chathead__actions">
+            <form
+              method="GET"
+              action="{{ route('conversations.show', { id: active.id }) }}"
+              class="chatsearch"
+              role="search"
+            >
+              <input
+                type="search"
+                name="q"
+                value="{{ search }}"
+                placeholder="Rechercher…"
+                class="field__input"
+                aria-label="Rechercher dans la conversation"
+                maxlength="100"
+              />
+            </form>
+            @if(!active.isGroup && active.otherId && !active.blockedByMe)
+              <details class="blockbox">
+                <summary class="btn btn--secondary btn--sm">
+                  @svg('lucide:ban', { width: 14, height: 14 })
+                  Bloquer
+                </summary>
+                @form({
+                  route: 'users.block',
+                  routeParams: { id: active.otherId },
+                  method: 'POST',
+                })
+                  <span>Bloquer cette personne ?</span>
+                  <button type="submit" class="msg__yes">Oui</button>
+                @end
+              </details>
+            @end
+          </div>
         </header>
+
+        @if(search)
+          <div class="searchbar">
+            <span>{{ messages.length }} résultat(s) pour « {{ search }} »</span>
+            <a href="{{ route('conversations.show', { id: active.id }) }}" class="il">Effacer la recherche</a>
+          </div>
+        @end
 
         <div
           class="msgs"
           data-conversation-id="{{ active.id }}"
           data-user-id="{{ auth.user.id }}"
           data-group="{{ active.isGroup ? '1' : '0' }}"
+          data-live="{{ search ? '0' : '1' }}"
           x-data
           x-init="$el.scrollTop = $el.scrollHeight"
         >
@@ -96,34 +164,53 @@
                 </div>
               </div>
             @end
+          @elseif(search)
+            <p class="msgs__empty">Aucun message ne correspond à votre recherche.</p>
           @else
             <p class="msgs__empty">Aucun message pour le moment. Écrivez le premier !</p>
           @end
         </div>
 
-        @form({
-          route: 'messages.store',
-          routeParams: { id: active.id },
-          method: 'POST',
-          class: 'composer',
-          'x-data': '{ submitting: false }',
-          'x-on:submit': 'submitting = true',
-        })
-          <textarea
-            name="content"
-            rows="1"
-            class="composer__input"
-            placeholder="Écrire un message…"
-            aria-label="Écrire un message"
-            autocomplete="off"
-            maxlength="2000"
-            required
-            x-on:keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); $el.form.requestSubmit() }"
-          ></textarea>
-          <button type="submit" class="btn btn--primary" x-bind:disabled="submitting">
-            @svg('lucide:send', { width: 15, height: 15 })
-            Envoyer
-          </button>
+        @if(active.blockedByMe)
+          <div class="composer composer--notice">
+            <span>Vous avez bloqué cette personne.</span>
+            @form({
+              route: 'users.unblock',
+              routeParams: { id: active.otherId },
+              method: 'POST',
+            })
+              <button type="submit" class="btn btn--secondary btn--sm">Débloquer</button>
+            @end
+          </div>
+        @elseif(active.blockedMe)
+          <div class="composer composer--notice">
+            <span>Vous ne pouvez pas envoyer de message à cette personne.</span>
+          </div>
+        @else
+          @form({
+            route: 'messages.store',
+            routeParams: { id: active.id },
+            method: 'POST',
+            class: 'composer',
+            'x-data': '{ submitting: false }',
+            'x-on:submit': 'submitting = true',
+          })
+            <textarea
+              name="content"
+              rows="1"
+              class="composer__input"
+              placeholder="Écrire un message…"
+              aria-label="Écrire un message"
+              autocomplete="off"
+              maxlength="2000"
+              required
+              x-on:keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); $el.form.requestSubmit() }"
+            ></textarea>
+            <button type="submit" class="btn btn--primary" x-bind:disabled="submitting">
+              @svg('lucide:send', { width: 15, height: 15 })
+              Envoyer
+            </button>
+          @end
         @end
       @else
         <div class="empty">

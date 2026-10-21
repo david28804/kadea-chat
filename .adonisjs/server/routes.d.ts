@@ -23,6 +23,8 @@ export type ScannedRoutes = {
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
     'profile.edit': { paramsTuple?: []; params?: {} }
@@ -68,6 +70,8 @@ export type ScannedRoutes = {
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.store': { paramsTuple?: []; params?: {} }
     'profile.update': { paramsTuple?: []; params?: {} }
     'profile.password': { paramsTuple?: []; params?: {} }

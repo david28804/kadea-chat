@@ -2,7 +2,12 @@
   Navigation principale (barre verticale à gauche).
   Ajoute une entrée ici pour chaque nouvelle zone de l'application.
 --}}
-@let(nav = [{ label: 'Conversations', route: 'dashboard', icon: 'lucide:message-circle' }])
+@let(nav = [
+  { label: 'Conversations', route: 'dashboard', icon: 'lucide:message-circle' },
+  { label: 'Contacts', route: 'conversations.create', icon: 'lucide:user-plus' },
+  { label: 'Groupes', route: 'groups.create', icon: 'lucide:users' },
+  { label: 'Paramètres', route: 'profile.edit', icon: 'lucide:settings' },
+])
 @let(pageTitle = $props.get('title'))
 <!DOCTYPE html>
 <html
@@ -52,9 +57,6 @@
 
         <div class="rail__bottom">
           @!themeToggle()
-          <a href="{{ route('profile.edit') }}" class="iconbtn" aria-label="Mon profil" title="Mon profil">
-            @svg('lucide:user', { width: 16, height: 16 })
-          </a>
           @form({ route: 'session.destroy', method: 'POST' })
             <button type="submit" class="iconbtn" aria-label="Se déconnecter" title="Se déconnecter">
               @svg('lucide:log-out', { width: 16, height: 16 })

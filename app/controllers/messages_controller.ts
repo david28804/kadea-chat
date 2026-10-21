@@ -1,6 +1,7 @@
 import Conversation from '#models/conversation'
 import ConversationMember from '#models/conversation_member'
 import Message from '#models/message'
+import BlockedUser from '#models/blocked_user'
 import transmit from '@adonisjs/transmit/services/main'
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
@@ -16,7 +17,7 @@ export default class MessagesController {
   /**
    * Enregistre un nouveau message dans une conversation
    */
-  async store({ auth, params, request, response }: HttpContext) {
+  async store({ auth, params, request, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const id = Number(params.id)
 
@@ -33,6 +34,32 @@ export default class MessagesController {
       return response.notFound('Conversation introuvable')
     }
 
+    const conversation = await Conversation.find(id)
+
+    // Conversation privée : on refuse l'envoi si l'un des deux a bloqué l'autre
+    if (conversation && !conversation.isGroup) {
+      const other = await ConversationMember.query()
+        .where('conversationId', id)
+        .whereNot('userId', user.id)
+        .first()
+
+      if (other) {
+        const block = await BlockedUser.query()
+          .where((query) => {
+            query.where('blockerId', user.id).where('blockedId', other.userId)
+          })
+          .orWhere((query) => {
+            query.where('blockerId', other.userId).where('blockedId', user.id)
+          })
+          .first()
+
+        if (block) {
+          session.flash('error', "Vous ne pouvez pas envoyer de message dans cette conversation.")
+          return response.redirect().toRoute('conversations.show', { id })
+        }
+      }
+    }
+
     const { content } = await request.validateUsing(messageValidator)
 
     const message = await Message.create({
@@ -41,7 +68,6 @@ export default class MessagesController {
       content,
     })
 
-    const conversation = await Conversation.find(id)
     if (conversation) {
       await conversation.save()
     }
@@ -83,7 +109,6 @@ export default class MessagesController {
       message.content = null
       await message.save()
 
-      // Prévient les autres personnes de la conversation
       transmit.broadcast(`conversations/${message.conversationId}`, {
         type: 'deleted',
         id: message.id,

@@ -1513,3 +1513,157 @@ label.person {
     opacity: 1;
   }
 }
+
+/* ==========================================================================
+   Blocage d'un utilisateur
+   ========================================================================== */
+.chathead__actions {
+  margin-left: auto;
+}
+.blockbox {
+  position: relative;
+}
+.blockbox summary {
+  list-style: none;
+  cursor: pointer;
+}
+.blockbox summary::-webkit-details-marker {
+  display: none;
+}
+.blockbox form {
+  position: absolute;
+  right: 0;
+  top: 42px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--field);
+  border: 1px solid var(--line-2);
+  color: var(--ink);
+  font-size: 12px;
+  box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.4);
+}
+.composer--notice {
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   Recherche dans une conversation
+   ========================================================================== */
+.chathead__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chatsearch .field__input {
+  width: 190px;
+  height: 34px;
+  font-size: 13.5px;
+}
+.searchbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  .chatsearch .field__input {
+    width: 120px;
+  }
+}
+
+
+/* ==========================================================================
+   Habillage final : même look que la maquette
+   ========================================================================== */
+:root {
+  --panel-bg: var(--card);
+  --chat-bg: var(--paper);
+  --hover: var(--line);
+}
+:root[data-theme='dark'] {
+  --panel-bg: linear-gradient(135deg, #424242 0%, #202020 50%, #090909 100%);
+  --chat-bg: linear-gradient(135deg, #424242 0%, #202020 50%, #090909 100%);
+  --hover: rgba(255, 255, 255, 0.07);
+}
+
+.rail,
+.convlist {
+  background: var(--panel-bg);
+}
+.chatpane {
+  background: var(--chat-bg);
+}
+.chathead {
+  background: transparent;
+}
+.composer {
+  background: var(--card);
+}
+
+.conv:hover {
+  background: var(--hover);
+}
+.conv--active {
+  background: var(--hover);
+  box-shadow: inset 3px 0 0 var(--btn);
+}
+.rail__item:hover {
+  background: var(--hover);
+}
+
+/* Recherche et filtres de la liste */
+.convlist__head {
+  padding-bottom: 8px;
+}
+.convlist__search {
+  padding: 0 16px 10px;
+}
+.convlist__search .field__input {
+  width: 100%;
+}
+.convfilters {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px 10px;
+}
+.convfilters button {
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: var(--muted);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.convfilters button:hover {
+  color: var(--ink);
+}
+.convfilters button[aria-pressed='true'] {
+  background: var(--btn);
+  color: var(--btn-fg);
+  border-color: transparent;
+  font-weight: 500;
+}
+
+/* Bouton du bas de la liste */
+.convlist__foot {
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+.convlist__foot .btn {
+  width: 100%;
+}

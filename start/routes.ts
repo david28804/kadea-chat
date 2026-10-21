@@ -50,6 +50,8 @@ router
     router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
     router.post('/conversations/:id/messages', [controllers.Messages, 'store']).as('messages.store')
     router.post('/messages/:id/delete', [controllers.Messages, 'destroy']).as('messages.destroy')
+    router.post('/users/:id/block', [controllers.Blocks, 'store']).as('users.block')
+    router.post('/users/:id/unblock', [controllers.Blocks, 'destroy']).as('users.unblock')
     router.get('/groups/new', [controllers.Groups, 'create']).as('groups.create')
     router.post('/groups', [controllers.Groups, 'store']).as('groups.store')
     router.get('/profile', [controllers.Profiles, 'edit']).as('profile.edit')

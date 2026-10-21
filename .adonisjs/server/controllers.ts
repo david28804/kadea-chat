@@ -12,4 +12,5 @@ export const controllers = {
   PasswordResets: () => import('#controllers/password_resets_controller'),
   Profiles: () => import('#controllers/profiles_controller'),
   Session: () => import('#controllers/session_controller'),
+  Blocks: () => import('#controllers/blocks_controller'),
 }

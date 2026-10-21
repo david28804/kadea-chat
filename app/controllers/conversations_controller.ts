@@ -2,6 +2,7 @@ import User from '#models/user'
 import Conversation from '#models/conversation'
 import ConversationMember from '#models/conversation_member'
 import Message from '#models/message'
+import BlockedUser from '#models/blocked_user'
 import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -39,7 +40,6 @@ export default class ConversationsController {
           .orderBy('createdAt', 'desc')
           .first()
 
-        // Messages des autres, arrivés après ma dernière ouverture de la conversation
         const unreadQuery = Message.query()
           .where('conversationId', conversation.id)
           .whereNull('deletedAt')
@@ -87,10 +87,10 @@ export default class ConversationsController {
     const user = auth.getUserOrFail()
     const conversations = await this.buildList(user)
 
-    return view.render('pages/dashboard', { conversations, active: null, messages: [] })
+    return view.render('pages/dashboard', { conversations, active: null, messages: [], search: '' })
   }
 
-  async show({ auth, params, view, response }: HttpContext) {
+  async show({ auth, params, request, view, response }: HttpContext) {
     const user = auth.getUserOrFail()
     const id = Number(params.id)
 
@@ -110,11 +110,29 @@ export default class ConversationsController {
       return response.notFound('Conversation introuvable')
     }
 
+    // Mot recherché dans la conversation (vide = pas de recherche)
+    const search = String(request.input('q', '')).trim().slice(0, 100)
+
     const conversation = membership.conversation
     const other = conversation.members.find((member) => member.userId !== user.id)
     const title = conversation.isGroup
       ? (conversation.name ?? 'Groupe')
       : (other?.user.fullName ?? other?.user.email ?? 'Conversation')
+
+    // Blocage : qui a bloqué qui (conversations privées seulement)
+    let blockedByMe = false
+    let blockedMe = false
+    if (!conversation.isGroup && other) {
+      const blocks = await BlockedUser.query()
+        .where((query) => {
+          query.where('blockerId', user.id).where('blockedId', other.userId)
+        })
+        .orWhere((query) => {
+          query.where('blockerId', other.userId).where('blockedId', user.id)
+        })
+      blockedByMe = blocks.some((block) => block.blockerId === user.id)
+      blockedMe = blocks.some((block) => block.blockerId === other.userId)
+    }
 
     const active = {
       id: conversation.id,
@@ -122,10 +140,18 @@ export default class ConversationsController {
       initials: initialsOf(title),
       isGroup: conversation.isGroup,
       subtitle: conversation.isGroup ? `${conversation.members.length} membres` : (other?.user.email ?? ''),
+      otherId: conversation.isGroup ? null : (other?.userId ?? null),
+      blockedByMe,
+      blockedMe,
     }
 
     const rows = await Message.query()
       .where('conversationId', id)
+      .if(search, (query) => {
+        // On échappe % et _ pour qu'ils soient cherchés comme de simples caractères
+        const safe = search.replace(/[\\%_]/g, '\\$&')
+        query.whereNull('deletedAt').whereILike('content', `%${safe}%`)
+      })
       .preload('sender')
       .orderBy('createdAt', 'desc')
       .limit(200)
@@ -149,13 +175,15 @@ export default class ConversationsController {
       }
     })
 
-    // Marque la conversation comme lue : le compteur repasse à zéro
-    membership.lastReadAt = DateTime.now()
-    await membership.save()
+    // Pendant une recherche, on ne marque pas la conversation comme lue
+    if (!search) {
+      membership.lastReadAt = DateTime.now()
+      await membership.save()
+    }
 
     const conversations = await this.buildList(user)
 
-    return view.render('pages/dashboard', { conversations, active, messages })
+    return view.render('pages/dashboard', { conversations, active, messages, search })
   }
 
   async create({ auth, request, view }: HttpContext) {
