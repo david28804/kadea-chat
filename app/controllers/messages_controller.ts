@@ -49,7 +49,6 @@ export default class MessagesController {
     }
 
     // Annonce le message à tous ceux qui écoutent cette conversation
-    console.log(`[temps réel] annonce du message ${message.id} sur conversations/${id}`)
     transmit.broadcast(`conversations/${id}`, {
       id: message.id,
       senderId: user.id,

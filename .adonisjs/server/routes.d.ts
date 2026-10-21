@@ -24,6 +24,9 @@ export type ScannedRoutes = {
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
+    'profile.edit': { paramsTuple?: []; params?: {} }
+    'profile.update': { paramsTuple?: []; params?: {} }
+    'profile.password': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -38,6 +41,7 @@ export type ScannedRoutes = {
     'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.create': { paramsTuple?: []; params?: {} }
+    'profile.edit': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -51,6 +55,7 @@ export type ScannedRoutes = {
     'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.create': { paramsTuple?: []; params?: {} }
+    'profile.edit': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -62,6 +67,8 @@ export type ScannedRoutes = {
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.store': { paramsTuple?: []; params?: {} }
+    'profile.update': { paramsTuple?: []; params?: {} }
+    'profile.password': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
   }
 }

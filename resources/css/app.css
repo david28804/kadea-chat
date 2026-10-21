@@ -1358,3 +1358,23 @@ label.person {
   flex: none;
   accent-color: var(--btn);
 }
+
+/* ==========================================================================
+   Messages non lus
+   ========================================================================== */
+.conv__row--sub {
+  align-items: center;
+}
+.conv__badge {
+  flex: none;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--btn);
+  color: var(--btn-fg);
+  font-size: 12px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}

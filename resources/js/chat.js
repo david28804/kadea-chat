@@ -27,8 +27,6 @@ if (box) {
   const subscription = transmit.subscription(`conversations/${conversationId}`)
 
   subscription.onMessage((data) => {
-    console.log('[temps réel] message reçu', data)
-
     // Évite d'afficher deux fois le même message
     if (box.querySelector(`[data-message-id="${data.id}"]`)) return
 

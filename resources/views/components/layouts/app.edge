@@ -57,7 +57,9 @@
               @svg('lucide:log-out', { width: 16, height: 16 })
             </button>
           @end
-          <span class="rail__avatar">{{ auth.user?.initials }}</span>
+          <a href="{{ route('profile.edit') }}" class="rail__avatar" aria-label="Mon profil" title="Mon profil">
+            {{ auth.user?.initials || '?' }}
+          </a>
         </div>
       </nav>
 

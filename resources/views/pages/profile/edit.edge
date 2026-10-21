@@ -1,0 +1,54 @@
+@layouts.app({ title: 'Mon profil' })
+  <div class="newconv">
+    <div class="newconv__inner">
+      <a href="{{ route('dashboard') }}" class="il newconv__back">← Retour aux conversations</a>
+      <h1 class="newconv__title">Mon profil</h1>
+      <p class="newconv__sub">Gérez vos informations et votre mot de passe.</p>
+
+      <div class="panel" style="margin-top: 20px;">
+        <h2 class="section__title">Informations</h2>
+        @form({ route: 'profile.update', method: 'POST', class: 'auth__form' })
+          @field.root({ name: 'fullName' })
+            @!field.label({ text: 'Nom complet' })
+            <input
+              type="text"
+              name="fullName"
+              value="{{ me.fullName }}"
+              class="field__input"
+              autocomplete="name"
+            />
+            @!field.error()
+          @end
+          <div class="field">
+            <span class="field__label">Adresse e-mail</span>
+            <input type="email" value="{{ me.email }}" class="field__input" disabled />
+            <p class="field__hint">L'adresse e-mail ne peut pas être modifiée.</p>
+          </div>
+          @!button({ text: 'Enregistrer', type: 'submit' })
+        @end
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
+        <h2 class="section__title">Changer le mot de passe</h2>
+        @form({ route: 'profile.password', method: 'POST', class: 'auth__form' })
+          @field.root({ name: 'currentPassword' })
+            @!field.label({ text: 'Mot de passe actuel' })
+            @!input.control({ type: 'password', autocomplete: 'current-password', placeholder: '••••••••' })
+            @!field.error()
+          @end
+          @field.root({ name: 'password' })
+            @!field.label({ text: 'Nouveau mot de passe' })
+            @!input.control({ type: 'password', autocomplete: 'new-password', placeholder: '••••••••' })
+            @!field.error()
+          @end
+          @field.root({ name: 'passwordConfirmation' })
+            @!field.label({ text: 'Confirmer le nouveau mot de passe' })
+            @!input.control({ type: 'password', autocomplete: 'new-password', placeholder: '••••••••' })
+            @!field.error()
+          @end
+          @!button({ text: 'Changer le mot de passe', type: 'submit' })
+        @end
+      </div>
+    </div>
+  </div>
+@end

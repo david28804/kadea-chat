@@ -1,3 +1,4 @@
+
 /*
 |--------------------------------------------------------------------------
 | Routes file
@@ -9,6 +10,7 @@
 
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
+import ProfilesController from '#controllers/profiles_controller'
 import router from '@adonisjs/core/services/router'
 import transmit from '@adonisjs/transmit/services/main'
 
@@ -19,7 +21,11 @@ transmit.registerRoutes((route) => {
   }
 })
 
-router.on('/').render('pages/home').as('home')
+router
+  .get('/', async ({ auth, response }) => {
+    return response.redirect().toRoute(auth.user ? 'dashboard' : 'session.create')
+  })
+  .as('home')
 
 router
   .get('email/confirm/:token', [controllers.EmailConfirmations, 'handle'])
@@ -35,7 +41,11 @@ router
 
     router.get('forgot-password', [controllers.PasswordResets, 'create']).as('password.forgot')
     router.post('forgot-password', [controllers.PasswordResets, 'store']).as('password.store')
-    router.get('reset-password/:token', [controllers.PasswordResets, 'edit']).as('password.edit')
+
+    router
+      .get('reset-password/:token', [controllers.PasswordResets, 'edit'])
+      .as('password.edit')
+
     router
       .post('reset-password/:token', [controllers.PasswordResets, 'update'])
       .as('password.update')
@@ -45,12 +55,34 @@ router
 router
   .group(() => {
     router.get('/dashboard', [controllers.Conversations, 'index']).as('dashboard')
-    router.get('/conversations/new', [controllers.Conversations, 'create']).as('conversations.create')
-    router.get('/conversations/:id', [controllers.Conversations, 'show']).as('conversations.show')
-    router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
-    router.post('/conversations/:id/messages', [controllers.Messages, 'store']).as('messages.store')
+
+    router
+      .get('/conversations/new', [controllers.Conversations, 'create'])
+      .as('conversations.create')
+
+    router
+      .get('/conversations/:id', [controllers.Conversations, 'show'])
+      .as('conversations.show')
+
+    router
+      .post('/conversations', [controllers.Conversations, 'store'])
+      .as('conversations.store')
+
+    router
+      .post('/conversations/:id/messages', [controllers.Messages, 'store'])
+      .as('messages.store')
+
     router.get('/groups/new', [controllers.Groups, 'create']).as('groups.create')
     router.post('/groups', [controllers.Groups, 'store']).as('groups.store')
-    router.post('logout', [controllers.Session, 'destroy'])
+
+    // Profil utilisateur
+    router.get('/profile', [ProfilesController, 'edit']).as('profile.edit')
+    router.post('/profile', [ProfilesController, 'update']).as('profile.update')
+
+    router
+      .post('/profile/password', [ProfilesController, 'updatePassword'])
+      .as('profile.password')
+
+    router.post('logout', [controllers.Session, 'destroy']).as('session.destroy')
   })
   .use(middleware.auth())

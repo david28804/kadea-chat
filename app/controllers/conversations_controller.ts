@@ -39,6 +39,17 @@ export default class ConversationsController {
           .orderBy('createdAt', 'desc')
           .first()
 
+        // Messages des autres, arrivés après ma dernière ouverture de la conversation
+        const unreadQuery = Message.query()
+          .where('conversationId', conversation.id)
+          .whereNull('deletedAt')
+          .where('senderId', '<>', user.id)
+        if (membership.lastReadAt) {
+          unreadQuery.where('createdAt', '>', membership.lastReadAt.toSQL()!)
+        }
+        const unreadResult = await unreadQuery.count('* as total')
+        const unread = Number(unreadResult[0].$extras.total)
+
         const other = conversation.members.find((member) => member.userId !== user.id)
         const title = conversation.isGroup
           ? (conversation.name ?? 'Groupe')
@@ -62,6 +73,7 @@ export default class ConversationsController {
           isGroup: conversation.isGroup,
           preview,
           time,
+          unread,
           sortKey: activity.toMillis(),
         }
       })
@@ -137,6 +149,7 @@ export default class ConversationsController {
       }
     })
 
+    // Marque la conversation comme lue : le compteur repasse à zéro
     membership.lastReadAt = DateTime.now()
     await membership.save()
 

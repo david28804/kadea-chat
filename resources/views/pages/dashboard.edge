@@ -24,7 +24,12 @@
                   <span class="conv__name">{{ conversation.title }}</span>
                   <span class="conv__time">{{ conversation.time }}</span>
                 </span>
-                <span class="conv__preview">{{ conversation.preview }}</span>
+                <span class="conv__row conv__row--sub">
+                  <span class="conv__preview">{{ conversation.preview }}</span>
+                  @if(conversation.unread > 0)
+                    <span class="conv__badge">{{ conversation.unread }}</span>
+                  @end
+                </span>
               </span>
             </a>
           @end

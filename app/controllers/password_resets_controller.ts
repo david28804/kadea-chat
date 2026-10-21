@@ -4,6 +4,7 @@ import EmailTokenService from '#services/email_token_service'
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
+import db from '@adonisjs/lucid/services/db'
 
 const forgotValidator = vine.compile(
   vine.object({
@@ -68,21 +69,35 @@ export default class PasswordResetsController {
    * Enregistre le nouveau mot de passe
    */
   async update({ params, request, response, session }: HttpContext) {
-    const emailToken = await this.findValidToken(params.token)
+    const { password } = await request.validateUsing(resetValidator)
 
-    if (!emailToken) {
+    const tokenConsumed = await db.transaction(async (trx) => {
+      const emailToken = await EmailToken.query({ client: trx })
+        .where('tokenHash', EmailTokenService.hash(params.token))
+        .where('type', 'reset')
+        .whereNull('usedAt')
+        .where('expiresAt', '>', DateTime.now().toJSDate())
+        .forUpdate()
+        .first()
+
+      if (!emailToken) return false
+
+      const user = await User.query({ client: trx }).where('id', emailToken.userId).firstOrFail()
+      user.password = password
+      user.useTransaction(trx)
+      await user.save()
+
+      emailToken.usedAt = DateTime.now()
+      emailToken.useTransaction(trx)
+      await emailToken.save()
+
+      return true
+    })
+
+    if (!tokenConsumed) {
       session.flash('error', 'Ce lien est invalide ou a expiré. Refaites une demande.')
       return response.redirect().toRoute('password.forgot')
     }
-
-    const { password } = await request.validateUsing(resetValidator)
-
-    const user = await User.findOrFail(emailToken.userId)
-    user.password = password
-    await user.save()
-
-    emailToken.usedAt = DateTime.now()
-    await emailToken.save()
 
     session.flash('success', 'Mot de passe modifié. Vous pouvez vous connecter.')
     return response.redirect().toRoute('session.create')
