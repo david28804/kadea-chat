@@ -52,14 +52,14 @@
 
         <div class="rail__bottom">
           @!themeToggle()
+          <a href="{{ route('profile.edit') }}" class="iconbtn" aria-label="Mon profil" title="Mon profil">
+            @svg('lucide:user', { width: 16, height: 16 })
+          </a>
           @form({ route: 'session.destroy', method: 'POST' })
             <button type="submit" class="iconbtn" aria-label="Se déconnecter" title="Se déconnecter">
               @svg('lucide:log-out', { width: 16, height: 16 })
             </button>
           @end
-          <a href="{{ route('profile.edit') }}" class="rail__avatar" aria-label="Mon profil" title="Mon profil">
-            {{ auth.user?.initials || '?' }}
-          </a>
         </div>
       </nav>
 
