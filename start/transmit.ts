@@ -15,3 +15,10 @@ transmit.authorize<{ id: string }>('conversations/:id', async (ctx, { id }) => {
 
   return membership !== null
 })
+
+/**
+ * Le canal de présence est réservé aux personnes connectées
+ */
+transmit.authorize('presence', (ctx) => {
+  return ctx.auth.user !== undefined && ctx.auth.user !== null
+})

@@ -1667,3 +1667,22 @@ label.person {
 .convlist__foot .btn {
   width: 100%;
 }
+
+/* ==========================================================================
+   Présence en ligne
+   ========================================================================== */
+.conv__avatar {
+  position: relative;
+}
+.conv__avatar.is-online::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3ecf8e;
+  border: 2px solid var(--card);
+}
+

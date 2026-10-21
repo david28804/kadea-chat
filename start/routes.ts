@@ -19,7 +19,8 @@ transmit.registerRoutes((route) => {
   }
 })
 
-router.on('/').render('pages/home').as('home')
+// Accueil : redirige vers les conversations (la page de connexion si on n'est pas connecté)
+router.get('/', ({ response }) => response.redirect().toRoute('dashboard')).as('home')
 
 router
   .get('email/confirm/:token', [controllers.EmailConfirmations, 'handle'])
@@ -52,6 +53,7 @@ router
     router.post('/messages/:id/delete', [controllers.Messages, 'destroy']).as('messages.destroy')
     router.post('/users/:id/block', [controllers.Blocks, 'store']).as('users.block')
     router.post('/users/:id/unblock', [controllers.Blocks, 'destroy']).as('users.unblock')
+    router.post('/presence/ping', [controllers.Presences, 'ping']).as('presence.ping')
     router.get('/groups/new', [controllers.Groups, 'create']).as('groups.create')
     router.post('/groups', [controllers.Groups, 'store']).as('groups.store')
     router.get('/profile', [controllers.Profiles, 'edit']).as('profile.edit')

@@ -1,19 +1,12 @@
-import { Transmit } from '@adonisjs/transmit-client'
+import { transmit } from './realtime.js'
 
 // On cherche la zone des messages (elle n'existe que dans une conversation ouverte)
 const box = document.querySelector('[data-conversation-id]')
 
-if (box && box.dataset.live === '1') {
+if (box && transmit && box.dataset.live === '1') {
   const conversationId = box.dataset.conversationId
   const myId = Number(box.dataset.userId)
   const isGroup = box.dataset.group === '1'
-
-  const transmit = new Transmit({
-    baseUrl: window.location.origin,
-    onSubscribeFailed: (response) => {
-      console.error('[temps réel] abonnement refusé, code', response.status)
-    },
-  })
 
   const subscription = transmit.subscription(`conversations/${conversationId}`)
 

@@ -35,7 +35,10 @@
               data-unread="{{ conversation.unread }}"
               x-show="ok($el)"
             >
-              <span class="conv__avatar {{ conversation.isGroup ? 'conv__avatar--group' : '' }}">
+              <span
+                class="conv__avatar {{ conversation.isGroup ? 'conv__avatar--group' : '' }} {{ conversation.online ? 'is-online' : '' }}"
+                data-presence-user="{{ conversation.otherId ?? '' }}"
+              >
                 {{ conversation.initials }}
               </span>
               <span class="conv__body">
@@ -71,31 +74,18 @@
           <a href="{{ route('dashboard') }}" class="iconbtn chathead__back" aria-label="Retour à la liste">
             @svg('lucide:arrow-left', { width: 16, height: 16 })
           </a>
-          <span class="conv__avatar {{ active.isGroup ? 'conv__avatar--group' : '' }}">
+          <span
+            class="conv__avatar {{ active.isGroup ? 'conv__avatar--group' : '' }} {{ active.online ? 'is-online' : '' }}"
+            data-presence-user="{{ active.otherId ?? '' }}"
+          >
             {{ active.initials }}
           </span>
           <span class="chathead__text">
             <span class="conv__name">{{ active.title }}</span>
             <span class="conv__preview">{{ active.subtitle }}</span>
           </span>
-          <div class="chathead__actions">
-            <form
-              method="GET"
-              action="{{ route('conversations.show', { id: active.id }) }}"
-              class="chatsearch"
-              role="search"
-            >
-              <input
-                type="search"
-                name="q"
-                value="{{ search }}"
-                placeholder="Rechercher…"
-                class="field__input"
-                aria-label="Rechercher dans la conversation"
-                maxlength="100"
-              />
-            </form>
-            @if(!active.isGroup && active.otherId && !active.blockedByMe)
+          @if(!active.isGroup && active.otherId && !active.blockedByMe)
+            <div class="chathead__actions">
               <details class="blockbox">
                 <summary class="btn btn--secondary btn--sm">
                   @svg('lucide:ban', { width: 14, height: 14 })
@@ -110,23 +100,16 @@
                   <button type="submit" class="msg__yes">Oui</button>
                 @end
               </details>
-            @end
-          </div>
+            </div>
+          @end
         </header>
-
-        @if(search)
-          <div class="searchbar">
-            <span>{{ messages.length }} résultat(s) pour « {{ search }} »</span>
-            <a href="{{ route('conversations.show', { id: active.id }) }}" class="il">Effacer la recherche</a>
-          </div>
-        @end
 
         <div
           class="msgs"
           data-conversation-id="{{ active.id }}"
           data-user-id="{{ auth.user.id }}"
           data-group="{{ active.isGroup ? '1' : '0' }}"
-          data-live="{{ search ? '0' : '1' }}"
+          data-live="1"
           x-data
           x-init="$el.scrollTop = $el.scrollHeight"
         >
@@ -164,8 +147,6 @@
                 </div>
               </div>
             @end
-          @elseif(search)
-            <p class="msgs__empty">Aucun message ne correspond à votre recherche.</p>
           @else
             <p class="msgs__empty">Aucun message pour le moment. Écrivez le premier !</p>
           @end

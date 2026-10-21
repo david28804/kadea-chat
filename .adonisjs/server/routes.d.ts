@@ -25,6 +25,7 @@ export type ScannedRoutes = {
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'presence.ping': { paramsTuple?: []; params?: {} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
     'profile.edit': { paramsTuple?: []; params?: {} }
@@ -72,6 +73,7 @@ export type ScannedRoutes = {
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'presence.ping': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
     'profile.update': { paramsTuple?: []; params?: {} }
     'profile.password': { paramsTuple?: []; params?: {} }

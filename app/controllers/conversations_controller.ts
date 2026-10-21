@@ -3,6 +3,7 @@ import Conversation from '#models/conversation'
 import ConversationMember from '#models/conversation_member'
 import Message from '#models/message'
 import BlockedUser from '#models/blocked_user'
+import PresenceService from '#services/presence_service'
 import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -74,6 +75,8 @@ export default class ConversationsController {
           preview,
           time,
           unread,
+          otherId: conversation.isGroup ? null : (other?.userId ?? null),
+          online: !conversation.isGroup && other ? PresenceService.isOnline(other.userId) : false,
           sortKey: activity.toMillis(),
         }
       })
@@ -143,6 +146,7 @@ export default class ConversationsController {
       otherId: conversation.isGroup ? null : (other?.userId ?? null),
       blockedByMe,
       blockedMe,
+      online: !conversation.isGroup && other ? PresenceService.isOnline(other.userId) : false,
     }
 
     const rows = await Message.query()

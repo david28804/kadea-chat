@@ -1,4 +1,6 @@
 import Alpine from 'alpinejs'
+import './realtime.js'
+import './presence.js'
 import './chat.js'
 
 Alpine.data('alert', function () {
