@@ -39,7 +39,11 @@
                 class="conv__avatar {{ conversation.isGroup ? 'conv__avatar--group' : '' }} {{ conversation.online ? 'is-online' : '' }}"
                 data-presence-user="{{ conversation.otherId ?? '' }}"
               >
-                {{ conversation.initials }}
+                @if(conversation.avatar)
+                  <img src="/{{ conversation.avatar }}" alt="" class="conv__img" />
+                @else
+                  {{ conversation.initials }}
+                @end
               </span>
               <span class="conv__body">
                 <span class="conv__row">
@@ -78,7 +82,11 @@
             class="conv__avatar {{ active.isGroup ? 'conv__avatar--group' : '' }} {{ active.online ? 'is-online' : '' }}"
             data-presence-user="{{ active.otherId ?? '' }}"
           >
-            {{ active.initials }}
+            @if(active.avatar)
+              <img src="/{{ active.avatar }}" alt="" class="conv__img" />
+            @else
+              {{ active.initials }}
+            @end
           </span>
           <span class="chathead__text">
             <span class="conv__name">{{ active.title }}</span>
@@ -151,6 +159,8 @@
             <p class="msgs__empty">Aucun message pour le moment. Écrivez le premier !</p>
           @end
         </div>
+
+        <div class="typing" data-typing aria-live="polite"></div>
 
         @if(active.blockedByMe)
           <div class="composer composer--notice">

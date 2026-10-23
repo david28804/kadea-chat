@@ -1697,3 +1697,238 @@ label.person {
   font-style: italic;
   color: var(--muted);
 }
+
+/* ==========================================================================
+   Photo de profil
+   ========================================================================== */
+.conv__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+.avatar-lg {
+  width: 84px;
+  height: 84px;
+  min-width: 84px;
+  font-size: 26px;
+  flex: none;
+}
+.avatar-lg .conv__img {
+  width: 84px;
+  height: 84px;
+}
+.avatarbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 14px;
+}
+.avatarbox__forms {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+@media (max-width: 560px) {
+  .avatarbox {
+    flex-direction: column;
+  }
+}
+
+/* ==========================================================================
+   Avatars : vrais cercles, photo bien contenue, un peu d'espace
+   ========================================================================== */
+.conv__avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  aspect-ratio: 1 / 1;
+  flex: none;
+  border-radius: 50%;
+}
+.conv__avatar--group {
+  border-radius: 12px;
+}
+.conv__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: inherit;
+  display: block;
+}
+
+/* Grand cercle de la page Profil */
+.avatar-lg {
+  width: 84px;
+  height: 84px;
+  min-width: 84px;
+  min-height: 84px;
+  border-radius: 50%;
+}
+.avatar-lg .conv__img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Un peu d'espace dans la liste et l'en-tête */
+.conv {
+  gap: 14px;
+  padding: 12px 18px 12px 22px;
+}
+.chathead {
+  gap: 14px;
+  padding-left: 20px;
+}
+
+/* ==========================================================================
+   Photo de profil : appareil photo et fenêtre d'ajustement
+   ========================================================================== */
+.avatarpick__circle {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  flex: none;
+}
+.avatarpick__cam {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--btn);
+  color: var(--btn-fg);
+  border: 2px solid var(--field);
+  cursor: pointer;
+  transition: scale 0.15s;
+}
+.avatarpick__cam:hover {
+  scale: 1.08;
+}
+
+.cropper {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.6);
+}
+.cropper[hidden] {
+  display: none;
+}
+.cropper__box {
+  width: 340px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 22px;
+  background: var(--field);
+  color: var(--ink);
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+}
+.cropper__title {
+  font-size: 17px;
+  font-weight: 600;
+}
+.cropper__hint {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+.cropper__stage {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--line);
+  box-shadow: 0 0 0 3px var(--line-2);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+.cropper__stage:active {
+  cursor: grabbing;
+}
+.cropper__img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: none;
+  width: auto;
+  height: auto;
+  transform-origin: 0 0;
+  pointer-events: none;
+  user-select: none;
+}
+.cropper__zoom {
+  width: 260px;
+  accent-color: var(--btn);
+}
+.cropper__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
+
+
+/* ==========================================================================
+   Mon compte : carte en haut de la liste et cercle dans la barre
+   ========================================================================== */
+.meline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 16px 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+.meline:hover {
+  background: var(--hover, var(--line));
+}
+.meline__avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 13px;
+}
+.meline__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.meline__name {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.meline__sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+.me-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 14px;
+}

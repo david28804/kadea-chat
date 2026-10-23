@@ -76,6 +76,7 @@ export default class ConversationsController {
           time,
           unread,
           otherId: conversation.isGroup ? null : (other?.userId ?? null),
+          avatar: conversation.isGroup ? null : (other?.user.avatar ?? null),
           online: !conversation.isGroup && other ? PresenceService.isOnline(other.userId) : false,
           sortKey: activity.toMillis(),
         }
@@ -144,6 +145,7 @@ export default class ConversationsController {
       isGroup: conversation.isGroup,
       subtitle: conversation.isGroup ? `${conversation.members.length} membres` : (other?.user.email ?? ''),
       otherId: conversation.isGroup ? null : (other?.userId ?? null),
+      avatar: conversation.isGroup ? null : (other?.user.avatar ?? null),
       blockedByMe,
       blockedMe,
       online: !conversation.isGroup && other ? PresenceService.isOnline(other.userId) : false,

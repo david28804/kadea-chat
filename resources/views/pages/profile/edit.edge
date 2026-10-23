@@ -6,6 +6,88 @@
       <p class="newconv__sub">Gérez vos informations et votre mot de passe.</p>
 
       <div class="panel" style="margin-top: 20px;">
+        <h2 class="section__title">Photo de profil</h2>
+
+        <div class="avatarbox" data-avatar-picker>
+          <div class="avatarpick__circle">
+            <span class="conv__avatar avatar-lg">
+              @if(me.avatar)
+                <img
+                  src="/{{ me.avatar }}"
+                  alt="Votre photo de profil"
+                  class="conv__img"
+                  width="84"
+                  height="84"
+                />
+              @else
+                {{ me.initials }}
+              @end
+            </span>
+            <button
+              type="button"
+              class="avatarpick__cam"
+              data-avatar-open
+              aria-label="Changer la photo de profil"
+              title="Changer la photo"
+            >
+              @svg('lucide:camera', { width: 15, height: 15 })
+            </button>
+          </div>
+
+          <div class="avatarbox__forms">
+            <p class="field__hint">
+              Cliquez sur l'appareil photo pour choisir une image, puis ajustez-la dans le cercle.
+            </p>
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              data-avatar-input
+              hidden
+            />
+
+            @form({
+              route: 'profile.avatar',
+              method: 'POST',
+              enctype: 'multipart/form-data',
+              'data-avatar-form': 'true',
+            })
+              <input type="file" name="avatar" data-avatar-final hidden />
+            @end
+
+            @if(me.avatar)
+              @form({ route: 'profile.avatar.destroy', method: 'POST' })
+                <button type="submit" class="il">Supprimer la photo</button>
+              @end
+            @end
+          </div>
+
+          <div class="cropper" data-cropper hidden role="dialog" aria-modal="true" aria-label="Ajuster la photo">
+            <div class="cropper__box">
+              <h2 class="cropper__title">Ajuster la photo</h2>
+              <p class="cropper__hint">Glissez la photo pour la placer, et utilisez le curseur pour zoomer.</p>
+              <div class="cropper__stage" data-cropper-stage>
+                <img class="cropper__img" data-cropper-img alt="" draggable="false" />
+              </div>
+              <input
+                type="range"
+                class="cropper__zoom"
+                min="1"
+                max="3"
+                step="0.01"
+                value="1"
+                data-cropper-zoom
+                aria-label="Zoom"
+              />
+              <div class="cropper__actions">
+                <button type="button" class="btn btn--secondary" data-cropper-cancel>Annuler</button>
+                <button type="button" class="btn btn--primary" data-cropper-save>Enregistrer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
         <h2 class="section__title">Informations</h2>
         @form({ route: 'profile.update', method: 'POST', class: 'auth__form' })
           @field.root({ name: 'fullName' })

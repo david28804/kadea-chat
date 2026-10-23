@@ -22,13 +22,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {{ csrfMeta() }}
+    {{ csrfMeta() }}
     <title>{{ pageTitle ? `${pageTitle} - Kadea Chat` : 'Kadea Chat' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('dumper')
   </head>
   <body>
-      <div class="shell" data-user-id="{{ auth.user?.id }}">
+    <div class="shell" data-user-id="{{ auth.user?.id }}">
       <nav class="rail" aria-label="Navigation principale">
         <a href="/" class="rail__logo" aria-label="Kadea Chat">
           <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
@@ -57,6 +57,18 @@
         @end
 
         <div class="rail__bottom">
+          <a
+            href="{{ route('profile.edit') }}"
+            class="conv__avatar me-avatar is-online"
+            title="{{ auth.user?.fullName ?? auth.user?.email }} (vous)"
+            aria-label="Mon profil"
+          >
+            @if(auth.user?.avatar)
+              <img src="/{{ auth.user.avatar }}" alt="" class="conv__img" />
+            @else
+              {{ auth.user?.initials }}
+            @end
+          </a>
           @!themeToggle()
           @form({ route: 'session.destroy', method: 'POST' })
             <button type="submit" class="iconbtn" aria-label="Se déconnecter" title="Se déconnecter">
