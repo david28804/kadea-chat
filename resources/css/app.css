@@ -1932,3 +1932,91 @@ label.person {
   min-height: 40px;
   font-size: 14px;
 }
+
+/* ==========================================================================
+   Thème Kadea : rouge, blanc, noir
+   ========================================================================== */
+:root {
+  --paper: #f4f4f5;
+  --card: #ffffff;
+  --ink: #0b0b0c;
+  --ink-2: #27272a;
+  --muted: #666b73;
+  --subtle: #9ca3af;
+  --line: #e7e7ea;
+  --line-2: #d4d4d8;
+  --btn: #e53935;
+  --btn-fg: #ffffff;
+  --ring: rgba(229, 57, 53, 0.25);
+  --field: #ffffff;
+  --link: #c62828;
+}
+:root[data-theme='dark'] {
+  --paper: #0b0b0c;
+  --card: rgba(255, 255, 255, 0.05);
+  --ink: #ffffff;
+  --ink-2: #e5e5e5;
+  --muted: #c9c9ce;
+  --subtle: #8e8e96;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-2: rgba(255, 255, 255, 0.18);
+  --btn: #e53935;
+  --btn-fg: #ffffff;
+  --ring: rgba(229, 57, 53, 0.35);
+  --field: #141416;
+  --link: #ff7a75;
+  --panel-bg: linear-gradient(135deg, #3a111c 0%, #1a0c11 50%, #050505 100%);
+  --chat-bg: linear-gradient(135deg, #3a111c 0%, #1a0c11 50%, #050505 100%);
+  --hover: rgba(255, 255, 255, 0.07);
+}
+:root[data-theme='dark'] body {
+  background: linear-gradient(135deg, #3a111c 0%, #1a0c11 50%, #050505 100%) fixed;
+}
+
+/* Barre de gauche noire, dans les deux thèmes */
+.rail {
+  background: #0b0b0c;
+  border-right-color: #0b0b0c;
+}
+.rail__item {
+  color: #cfcfd4;
+}
+.rail__item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.rail__item[aria-current='page'] {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+.rail .iconbtn {
+  color: #d9d9dc;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.rail .iconbtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.rail .conv__avatar.is-online::after {
+  border-color: #0b0b0c;
+}
+
+/* Page de connexion : panneau noir à droite */
+.auth__aside {
+  background: #0b0b0c;
+  color: #ffffff;
+  border-left-color: #0b0b0c;
+}
+.auth__quote {
+  color: #ffffff;
+}
+.auth__aside .pitch__p {
+  color: #c9c9ce;
+}
+.auth__aside .iconbtn {
+  color: #d9d9dc;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+:root[data-theme='dark'] .auth__aside {
+  background: transparent;
+}
