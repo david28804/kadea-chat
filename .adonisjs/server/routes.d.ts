@@ -24,6 +24,7 @@ export type ScannedRoutes = {
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.typing': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.read': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -48,6 +49,7 @@ export type ScannedRoutes = {
     'dashboard': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'profile.edit': { paramsTuple?: []; params?: {} }
   }
@@ -62,6 +64,7 @@ export type ScannedRoutes = {
     'dashboard': { paramsTuple?: []; params?: {} }
     'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.create': { paramsTuple?: []; params?: {} }
     'profile.edit': { paramsTuple?: []; params?: {} }
   }

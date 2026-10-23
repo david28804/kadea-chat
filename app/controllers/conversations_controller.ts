@@ -24,6 +24,12 @@ function dayLabel(date: DateTime) {
   return date.toFormat('dd/MM/yyyy')
 }
 
+function sizeLabel(bytes: number) {
+  if (bytes < 1024) return `${bytes} o`
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} Ko`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
+}
+
 export default class ConversationsController {
   private async buildList(user: User) {
     const memberships = await ConversationMember.query()
@@ -39,6 +45,7 @@ export default class ConversationsController {
         const lastMessage = await Message.query()
           .where('conversationId', conversation.id)
           .whereNull('deletedAt')
+          .preload('attachments')
           .orderBy('createdAt', 'desc')
           .first()
 
@@ -60,7 +67,9 @@ export default class ConversationsController {
         let preview = 'Aucun message pour le moment'
         if (lastMessage) {
           const prefix = lastMessage.senderId === user.id ? 'Vous : ' : ''
-          preview = prefix + (lastMessage.content ?? '')
+          const body =
+            lastMessage.content ?? (lastMessage.attachments.length > 0 ? '📎 Fichier joint' : '')
+          preview = prefix + body
         }
 
         const activity = lastMessage ? lastMessage.createdAt : conversation.createdAt
@@ -160,6 +169,7 @@ export default class ConversationsController {
         query.whereNull('deletedAt').whereILike('content', `%${safe}%`)
       })
       .preload('sender')
+      .preload('attachments')
       .orderBy('createdAt', 'desc')
       .limit(200)
     rows.reverse()
@@ -183,8 +193,21 @@ export default class ConversationsController {
         else if (allOnline) status = 'delivered'
       }
 
+      // Fichier joint (un seul par message)
+      const file = message.isDeleted ? null : (message.attachments[0] ?? null)
+      const attachment = file
+        ? {
+            id: file.id,
+            name: file.originalName,
+            size: sizeLabel(file.size),
+            isImage: file.mimeType.startsWith('image/'),
+            url: `/attachments/${file.id}`,
+          }
+        : null
+
       return {
         status,
+        attachment,
         id: message.id,
         content: message.isDeleted ? null : message.content,
         isDeleted: message.isDeleted,

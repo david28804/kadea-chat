@@ -133,7 +133,22 @@
                 @if(message.isDeleted)
                   <span class="msg__deleted">Ce message a été supprimé</span>
                 @else
-                  <span class="msg__text">{{ message.content }}</span>
+                  @if(message.attachment)
+                    @if(message.attachment.isImage)
+                      <a href="{{ message.attachment.url }}" target="_blank" rel="noopener" class="msg__image">
+                        <img src="{{ message.attachment.url }}" alt="{{ message.attachment.name }}" loading="lazy" />
+                      </a>
+                    @else
+                      <a href="{{ message.attachment.url }}" class="msg__file">
+                        @svg('lucide:file-text', { width: 18, height: 18 })
+                        <span class="msg__filename">{{ message.attachment.name }}</span>
+                        <span class="msg__filesize">{{ message.attachment.size }}</span>
+                      </a>
+                    @end
+                  @end
+                  @if(message.content)
+                    <span class="msg__text">{{ message.content }}</span>
+                  @end
                 @end
                 <div class="msg__foot">
                   @if(message.isMine && !message.isDeleted)
@@ -181,14 +196,47 @@
             <span>Vous ne pouvez pas envoyer de message à cette personne.</span>
           </div>
         @else
-          @form({
-            route: 'messages.store',
-            routeParams: { id: active.id },
-            method: 'POST',
-            class: 'composer',
-            'x-data': '{ submitting: false }',
-            'x-on:submit': 'submitting = true',
-          })
+          <form
+            method="POST"
+            action="{{ route('messages.store', { id: active.id }) }}"
+            enctype="multipart/form-data"
+            class="composer"
+            x-data="{ submitting: false, file: '', tooBig: false }"
+            x-on:submit="submitting = true"
+          >
+            {{ csrfField() }}
+
+            <div class="composer__file" x-show="file" x-cloak>
+              @svg('lucide:paperclip', { width: 14, height: 14 })
+              <span x-text="file"></span>
+              <button
+                type="button"
+                aria-label="Retirer le fichier"
+                x-on:click="file = ''; $refs.picker.value = ''"
+              >
+                ×
+              </button>
+            </div>
+            <div class="composer__note" x-show="tooBig" x-cloak>Fichier trop lourd : 5 Mo maximum.</div>
+
+            <input
+              type="file"
+              name="attachment"
+              class="composer__picker"
+              x-ref="picker"
+              accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+              x-on:change="const f = $event.target.files[0]; if (f && f.size > 5 * 1024 * 1024) { $event.target.value = ''; file = ''; tooBig = true } else { file = f ? f.name : ''; tooBig = false }"
+            />
+            <button
+              type="button"
+              class="iconbtn composer__clip"
+              aria-label="Joindre un fichier"
+              title="Joindre un fichier"
+              x-on:click="$refs.picker.click()"
+            >
+              @svg('lucide:paperclip', { width: 16, height: 16 })
+            </button>
+
             <textarea
               name="content"
               rows="1"
@@ -197,14 +245,13 @@
               aria-label="Écrire un message"
               autocomplete="off"
               maxlength="2000"
-              required
               x-on:keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); $el.form.requestSubmit() }"
             ></textarea>
             <button type="submit" class="btn btn--primary" x-bind:disabled="submitting">
               @svg('lucide:send', { width: 15, height: 15 })
               Envoyer
             </button>
-          @end
+          </form>
         @end
       @else
         <div class="empty">
