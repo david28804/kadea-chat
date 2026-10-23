@@ -51,6 +51,7 @@ router
     router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
     router.post('/conversations/:id/messages', [controllers.Messages, 'store']).as('messages.store')
     router.post('/conversations/:id/typing', [controllers.Messages, 'typing']).as('messages.typing')
+    router.post('/conversations/:id/read', [controllers.Messages, 'read']).as('messages.read')
     router.post('/messages/:id/delete', [controllers.Messages, 'destroy']).as('messages.destroy')
     router.post('/users/:id/block', [controllers.Blocks, 'store']).as('users.block')
     router.post('/users/:id/unblock', [controllers.Blocks, 'destroy']).as('users.unblock')

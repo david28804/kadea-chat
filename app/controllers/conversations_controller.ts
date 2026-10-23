@@ -4,6 +4,7 @@ import ConversationMember from '#models/conversation_member'
 import Message from '#models/message'
 import BlockedUser from '#models/blocked_user'
 import PresenceService from '#services/presence_service'
+import transmit from '@adonisjs/transmit/services/main'
 import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -163,13 +164,27 @@ export default class ConversationsController {
       .limit(200)
     rows.reverse()
 
+    // Les autres membres : servent à calculer le statut (envoyé / reçu / lu)
+    const others = conversation.members.filter((member) => member.userId !== user.id)
+
     let previousDay = ''
     const messages = rows.map((message) => {
       const day = dayLabel(message.createdAt)
       const showDay = day !== previousDay
       previousDay = day
 
+      let status = 'sent'
+      if (message.senderId === user.id && others.length > 0) {
+        const allRead = others.every(
+          (member) => member.lastReadAt && member.lastReadAt.toMillis() >= message.createdAt.toMillis()
+        )
+        const allOnline = others.every((member) => PresenceService.isOnline(member.userId))
+        if (allRead) status = 'read'
+        else if (allOnline) status = 'delivered'
+      }
+
       return {
+        status,
         id: message.id,
         content: message.isDeleted ? null : message.content,
         isDeleted: message.isDeleted,
@@ -185,6 +200,9 @@ export default class ConversationsController {
     if (!search) {
       membership.lastReadAt = DateTime.now()
       await membership.save()
+
+      // Prévient les autres : mes messages passent en « lu » chez eux
+      transmit.broadcast(`conversations/${id}`, { type: 'read', userId: user.id })
     }
 
     const conversations = await this.buildList(user)

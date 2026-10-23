@@ -85,6 +85,38 @@ export default class MessagesController {
   }
 
   /**
+   * Marque la conversation comme lue par l'utilisateur
+   * et prévient les autres en temps réel (✓✓ rouge)
+   */
+  async read({ auth, params, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const id = Number(params.id)
+
+    if (!Number.isInteger(id)) {
+      return response.noContent()
+    }
+
+    const membership = await ConversationMember.query()
+      .where('conversationId', id)
+      .where('userId', user.id)
+      .first()
+
+    if (!membership) {
+      return response.notFound('Conversation introuvable')
+    }
+
+    membership.lastReadAt = DateTime.now()
+    await membership.save()
+
+    transmit.broadcast(`conversations/${id}`, {
+      type: 'read',
+      userId: user.id,
+    })
+
+    return response.noContent()
+  }
+
+  /**
    * Annonce que l'utilisateur est en train d'écrire
    */
   async typing({ auth, params, response }: HttpContext) {

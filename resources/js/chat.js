@@ -10,6 +10,16 @@ if (box && transmit && box.dataset.live === '1') {
 
   const subscription = transmit.subscription(`conversations/${conversationId}`)
 
+  // Dit au serveur « j'ai lu cette conversation » (la coche passe en rouge chez l'autre)
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? ''
+  function markRead() {
+    fetch(`/conversations/${conversationId}/read`, {
+      method: 'POST',
+      headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+    }).catch(() => {})
+  }
+
   subscription.onMessage((data) => {
     // Un message a été supprimé : on remplace son contenu
     if (data.type === 'deleted') {
@@ -21,6 +31,9 @@ if (box && transmit && box.dataset.live === '1') {
         const trash = bubble.querySelector('.msg__del')
         if (trash) trash.remove()
 
+        const tick = bubble.querySelector('.msg__tick')
+        if (tick) tick.remove()
+
         if (!bubble.querySelector('.msg__deleted')) {
           const note = document.createElement('span')
           note.className = 'msg__deleted'
@@ -31,6 +44,20 @@ if (box && transmit && box.dataset.live === '1') {
       }
       return
     }
+
+    // L'autre personne a lu la conversation : mes coches passent en « lu »
+    if (data.type === 'read') {
+      if (!isGroup && data.userId !== myId) {
+        box.querySelectorAll('.msg--mine .msg__tick').forEach((tick) => {
+          tick.dataset.status = 'read'
+          tick.textContent = '✓✓'
+        })
+      }
+      return
+    }
+
+    // Seuls les nouveaux messages créent une bulle
+    if (data.type !== 'new') return
 
     // Évite d'afficher deux fois le même message
     if (box.querySelector(`[data-message-id="${data.id}"]`)) return
@@ -61,10 +88,23 @@ if (box && transmit && box.dataset.live === '1') {
     time.className = 'msg__time'
     time.textContent = data.time
     foot.appendChild(time)
+
+    if (mine) {
+      const tick = document.createElement('span')
+      tick.className = 'msg__tick'
+      tick.dataset.status = 'sent'
+      tick.title = 'Statut du message'
+      tick.textContent = '✓'
+      foot.appendChild(tick)
+    }
+
     bubble.appendChild(foot)
 
     box.appendChild(bubble)
     box.scrollTop = box.scrollHeight
+
+    // Je regarde la conversation : le message de l'autre est lu tout de suite
+    if (!mine) markRead()
   })
 
   subscription.create().catch((error) => {

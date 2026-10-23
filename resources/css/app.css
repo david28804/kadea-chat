@@ -2020,3 +2020,25 @@ label.person {
 :root[data-theme='dark'] .auth__aside {
   background: transparent;
 }
+
+
+/* ==========================================================================
+   Statuts des messages : ✓ envoyé, ✓✓ reçu, ✓✓ bleu = lu
+   ========================================================================== */
+.msg__tick {
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: -2px;
+  margin-left: 6px;
+  opacity: 0.65;
+  user-select: none;
+  transition: color 0.2s, opacity 0.2s;
+}
+.msg__tick[data-status='delivered'] {
+  opacity: 0.9;
+}
+.msg__tick[data-status='read'] {
+  color: #4fc3f7;
+  opacity: 1;
+  font-weight: 700;
+}

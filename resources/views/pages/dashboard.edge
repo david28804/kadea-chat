@@ -152,6 +152,9 @@
                     </details>
                   @end
                   <span class="msg__time">{{ message.time }}</span>
+                  @if(message.isMine && !message.isDeleted)
+                    <span class="msg__tick" data-status="{{ message.status }}" title="Statut du message">{{ message.status === 'sent' ? '✓' : '✓✓' }}</span>
+                  @end
                 </div>
               </div>
             @end
