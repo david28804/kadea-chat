@@ -8,7 +8,7 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
   --serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
-  /* Thème clair : gris et blanc */
+  /* Couleurs de base, thème clair */
   --ok: #202020;
 
   --r: 8px;
@@ -17,7 +17,7 @@
 }
 
 :root[data-theme='dark'] {
-  /* Thème sombre : gris, blanc, textes blancs */
+  /* Couleurs de base, thème sombre */
   --ok: #ffffff;
   color-scheme: dark;
 }
@@ -234,7 +234,7 @@ input {
 }
 
 /* ==========================================================================
-   Auth — split, form left, colophon + Plus pitch right
+   Pages de connexion : formulaire
    ========================================================================== */
 .auth {
   display: grid;
@@ -256,10 +256,6 @@ input {
 .auth__foot {
   text-align: center;
 }
-
-/* ==========================================================================
-   App layout
-   ========================================================================== */
 
 /* ==========================================================================
    Page building blocks
@@ -444,7 +440,7 @@ input {
 }
 
 /* ==========================================================================
-   Messagerie : barre de navigation verticale
+   Structure de l'application : une colonne, pleine hauteur
    ========================================================================== */
 .shell {
   display: grid;
@@ -466,7 +462,7 @@ input {
   white-space: nowrap;
 }
 
-/* Mobile : la barre passe en bas de l'écran */
+/* Mobile : une seule colonne */
 @media (max-width: 760px) {
   .shell {
     grid-template-columns: 1fr;
@@ -777,9 +773,6 @@ label.person {
 }
 
 
-/* Confirmation de suppression, dans la bulle */
-
-
 /* ==========================================================================
    Suppression d'un message (version sans script)
    ========================================================================== */
@@ -910,7 +903,7 @@ label.person {
 
 
 /* ==========================================================================
-   Habillage final : même look que la maquette
+   Liste des conversations : fonds, survol, recherche et filtres
    ========================================================================== */
 :root {
   --panel-bg: var(--card);
@@ -1157,7 +1150,6 @@ label.person {
 }
 
 
-
 /* ==========================================================================
    Mon compte : carte en haut de la liste et cercle dans la barre
    ========================================================================== */
@@ -1202,10 +1194,6 @@ label.person {
 :root[data-theme='dark'] body {
   background: linear-gradient(180deg, #121211 0%, #0b0b0b 60%, #0e0d0c 100%) fixed;
 }
-
-/* Barre de gauche noire, dans les deux thèmes */
-
-/* Page de connexion : panneau noir à droite */
 
 
 /* ==========================================================================
@@ -1321,8 +1309,8 @@ label.person {
    (ce bloc doit rester le DERNIER du fichier)
    ========================================================================== */
 :root {
-  --kadea-red: #e5e3d3;
-  --kadea-red-dark: #cfccb9;
+  --kadea-accent: #e5e3d3;
+  --kadea-accent-dark: #cfccb9;
   --btn: #e5e3d3;
   --btn-fg: #111111;
   --ring: rgba(229, 227, 211, 0.25);
@@ -1335,13 +1323,13 @@ label.person {
 
 /* Bouton principal : crème */
 .btn--primary {
-  background: var(--kadea-red);
+  background: var(--kadea-accent);
   color: #111111;
-  border-color: var(--kadea-red);
+  border-color: var(--kadea-accent);
 }
 .btn--primary:hover {
-  background: var(--kadea-red-dark);
-  border-color: var(--kadea-red-dark);
+  background: var(--kadea-accent-dark);
+  border-color: var(--kadea-accent-dark);
 }
 .btn--primary:disabled {
   opacity: 0.6;
@@ -1356,8 +1344,8 @@ label.person {
 }
 .btn--secondary:hover {
   background: var(--card);
-  border-color: var(--kadea-red);
-  color: var(--kadea-red);
+  border-color: var(--kadea-accent);
+  color: var(--kadea-accent);
 }
 
 /* Bouton discret */
@@ -1365,14 +1353,14 @@ label.person {
   color: var(--ink);
 }
 .btn--ghost:hover {
-  color: var(--kadea-red);
+  color: var(--kadea-accent);
 }
 
 /* Boutons à icône (retour, trombone, thème) */
 .iconbtn:hover {
   background: var(--card);
-  color: var(--kadea-red);
-  border-color: var(--kadea-red);
+  color: var(--kadea-accent);
+  border-color: var(--kadea-accent);
 }
 
 /* Anneau de focus crème sur tous les boutons */
@@ -1384,19 +1372,17 @@ label.person {
 
 /* Petits boutons « Oui » des confirmations */
 .msg__yes {
-  background: var(--kadea-red);
+  background: var(--kadea-accent);
   color: #111111;
   border-radius: 6px;
   padding: 2px 10px;
 }
 .msg__yes:hover {
-  background: var(--kadea-red-dark);
+  background: var(--kadea-accent-dark);
 }
 
-/* Filtres Toutes / Non lues / Groupes */
-
 /* ==========================================================================
-   Thème Kadea : boutons bordeaux #e5e3d3
+   Filtres de la liste et boutons pleins
    (à garder tout à la fin du fichier)
    ========================================================================== */
 
@@ -1442,7 +1428,7 @@ label.person {
   opacity: 1;
 }
 
-/* Thème sombre : un liseré clair pour que le bordeaux reste visible */
+/* Thème sombre : un liseré crème autour des boutons pleins */
 :root[data-theme='dark'] .convfilters button[aria-pressed='true'],
 :root[data-theme='dark'] .convlist__foot .btn,
 :root[data-theme='dark'] .convlist__foot .btn--primary {
@@ -1450,7 +1436,7 @@ label.person {
 }
 
 /* ==========================================================================
-   Navigation dans l'en-tête de la liste (remplace la barre verticale)
+   Navigation dans l'en-tête de la liste
    ========================================================================== */
 .convnav {
   display: flex;
@@ -1506,7 +1492,7 @@ label.person {
 
 
 /* ==========================================================================
-   Liste noire et discussion en dégradé bordeaux → noir, dans les deux thèmes
+   Liste et zone de discussion : couleurs sombres de base
    ========================================================================== */
 .convlist,
 .chatpane {
@@ -1666,7 +1652,7 @@ label.person {
   background: var(--hover);
 }
 
-/* Bouton « Nouvelle conversation » de l'écran vide : bordeaux */
+/* Bouton « Nouvelle conversation » de l'écran vide */
 .empty .btn--primary {
   background: #e5e3d3;
   border-color: #e5e3d3;
@@ -1678,7 +1664,7 @@ label.person {
   color: #111111;
 }
 
-/* Bouton « Envoyer » : bordeaux */
+/* Bouton « Envoyer » */
 .composer .composer__send {
   background: #e5e3d3;
   border-color: #e5e3d3;
@@ -1699,12 +1685,11 @@ label.person {
   display: none;
 }
 
-/* Icône au-dessus de « Vos conversations commencent ici » : bordeaux */
+/* Icône au-dessus de « Vos conversations commencent ici » */
 .empty__mark {
   background: #e5e3d3;
   color: #111111;
 }
-
 
 
 /* ==========================================================================
@@ -2180,8 +2165,8 @@ body.kc .newchat {
   --btn: #e5e3d3;
   --btn-fg: #111111;
   --ring: rgba(229, 227, 211, 0.18);
-  --kadea-red: #e5e3d3;
-  --kadea-red-dark: #cfccb9;
+  --kadea-accent: #e5e3d3;
+  --kadea-accent-dark: #cfccb9;
   --l-cream: #e5e3d3;
   --l-dim: rgba(229, 227, 211, 0.62);
 }
@@ -2329,8 +2314,6 @@ body.kc .iconbtn:hover {
   font-size: 17px;
   color: var(--l-dim);
 }
-
-/* Zone de discussion : même dégradé qu'avant, le bordeaux remplacé par le crème du thème */
 
 /* Pages de connexion : une seule colonne, le formulaire au centre */
 .lauth {
@@ -2497,8 +2480,6 @@ body.kc .iconbtn:hover {
   }
 }
 
-/* Zone de discussion : même fond que la carte « Votre espace d'équipe » de l'accueil */
-
 /* Bloc « Kadea Chat » : mêmes dimensions que la carte « Messagerie d'équipe » */
 .lhero {
   max-width: 1100px;
@@ -2528,8 +2509,6 @@ body.kc .iconbtn:hover {
     min-height: 460px;
   }
 }
-
-/* Zone de discussion : même fond que la carte « Votre espace d’équipe » (lueur dorée en haut) */
 /* L'en-tête et la saisie restent transparents pour laisser voir la lueur */
 body.kc .chatpane .chathead {
   background: transparent;
@@ -2537,8 +2516,6 @@ body.kc .chatpane .chathead {
 body.kc .chatpane .composer {
   background: rgba(10, 10, 10, 0.5);
 }
-
-/* Zone de discussion : dégradé vertical demandé */
 
 
 /* ==========================================================================
@@ -2563,8 +2540,8 @@ body.kc .chatpane .composer {
   --btn: #1c1b17;
   --btn-fg: #e5e3d3;
   --ring: rgba(28, 27, 23, 0.15);
-  --kadea-red: #1c1b17;
-  --kadea-red-dark: #34302a;
+  --kadea-accent: #1c1b17;
+  --kadea-accent-dark: #34302a;
   --l-cream: #1c1b17;
   --l-dim: rgba(28, 27, 23, 0.62);
 }
@@ -2870,6 +2847,8 @@ body.kc .searchbar {
   color: var(--ink);
 }
 .msgresult__hit {
+  background: #e5e3d3;
+  color: #111111;
   border-radius: 3px;
   padding: 0 2px;
 }
