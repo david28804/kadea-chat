@@ -149,3 +149,79 @@ if (box && transmit && box.dataset.live === '1') {
     console.error('[temps réel] indisponible', error)
   })
 }
+
+// Recherche dans la conversation : les messages se filtrent pendant la frappe,
+// le mot cherché est surligné. Entrée lance la recherche complète sur le serveur.
+const searchInput = document.querySelector('.chatsearch input[name="q"]')
+
+// Remet le texte d'origine du message, puis entoure chaque occurrence d'un <mark>
+// (on reconstruit le texte morceau par morceau, jamais de innerHTML)
+function highlight(el, needle) {
+  if (el.dataset.original === undefined) el.dataset.original = el.textContent
+  const text = el.dataset.original
+  el.textContent = ''
+  if (!needle) {
+    el.textContent = text
+    return
+  }
+  const lower = text.toLowerCase()
+  let from = 0
+  let at = lower.indexOf(needle)
+  while (at !== -1) {
+    el.append(text.slice(from, at))
+    const mark = document.createElement('mark')
+    mark.textContent = text.slice(at, at + needle.length)
+    el.append(mark)
+    from = at + needle.length
+    at = lower.indexOf(needle, from)
+  }
+  el.append(text.slice(from))
+}
+
+function filterMessages(query) {
+  const needle = query.trim().toLowerCase()
+  let found = 0
+
+  box.querySelectorAll('.msg').forEach((msg) => {
+    const textEl = msg.querySelector('.msg__text')
+    const text = textEl ? (textEl.dataset.original ?? textEl.textContent) : ''
+    const match = !needle || text.toLowerCase().includes(needle)
+    msg.hidden = !match
+    if (textEl) highlight(textEl, match ? needle : '')
+    if (match && needle) found++
+  })
+
+  // Les séparateurs de jour n'ont plus de sens pendant un filtrage
+  box.querySelectorAll('.msgs__day').forEach((day) => (day.hidden = Boolean(needle)))
+
+  let status = document.querySelector('[data-live-search]')
+  if (needle && !box.dataset.search) {
+    if (!status) {
+      status = document.createElement('div')
+      status.className = 'searchbar'
+      status.dataset.liveSearch = ''
+      box.before(status)
+    }
+    status.textContent =
+      found === 0
+        ? 'Aucun message affiché ne correspond. Appuyez sur Entrée pour chercher dans tout l’historique.'
+        : `${found} ${found > 1 ? 'messages correspondent' : 'message correspond'} à « ${query.trim()} »`
+  } else if (status) {
+    status.remove()
+  }
+}
+
+if (box && searchInput) {
+  if (box.dataset.search) filterMessages(box.dataset.search)
+  searchInput.addEventListener('input', () => filterMessages(searchInput.value))
+}
+
+// Échap ferme le champ : on réaffiche tous les messages
+if (box && searchInput) {
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !box.dataset.search) {
+      searchInput.value = ''
+      filterMessages('')
+    }
+  })
+}

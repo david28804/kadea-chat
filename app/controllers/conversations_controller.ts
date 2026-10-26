@@ -30,7 +30,66 @@ function sizeLabel(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
 }
 
+// Extrait du message autour du mot trouvé : « …avant MOT après… »
+function snippetAround(content: string, query: string, radius = 40) {
+  const at = content.toLowerCase().indexOf(query.toLowerCase())
+  if (at === -1) return content.slice(0, radius * 2)
+  const start = Math.max(0, at - radius)
+  const end = Math.min(content.length, at + query.length + radius)
+  return `${start > 0 ? '…' : ''}${content.slice(start, end)}${end < content.length ? '…' : ''}`
+}
+
 export default class ConversationsController {
+  /**
+   * Recherche d'un mot dans les messages de toutes mes conversations (JSON,
+   * utilisé par la barre de recherche de la liste)
+   */
+  async searchMessages({ auth, request }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const query = String(request.input('q', '')).trim().slice(0, 100)
+    if (query.length < 2) return []
+
+    const memberships = await ConversationMember.query().where('userId', user.id)
+    const conversationIds = memberships.map((membership) => membership.conversationId)
+    if (conversationIds.length === 0) return []
+
+    // On échappe % et _ pour qu'ils soient cherchés comme de simples caractères
+    const safe = query.replace(/[\\%_]/g, '\\$&')
+    const rows = await Message.query()
+      .whereIn('conversationId', conversationIds)
+      .whereNull('deletedAt')
+      .whereILike('content', `%${safe}%`)
+      .preload('sender')
+      .preload('conversation', (conversation) => {
+        conversation.preload('members', (member) => member.preload('user'))
+      })
+      .orderBy('createdAt', 'desc')
+      .limit(30)
+
+    return rows.map((message) => {
+      const conversation = message.conversation
+      const other = conversation.members.find((member) => member.userId !== user.id)
+      const title = conversation.isGroup
+        ? (conversation.name ?? 'Groupe')
+        : (other?.user.fullName ?? other?.user.email ?? 'Conversation')
+      const author =
+        message.senderId === user.id
+          ? 'Vous'
+          : (message.sender?.fullName ?? message.sender?.email ?? 'Utilisateur supprimé')
+
+      return {
+        id: message.id,
+        title,
+        author: conversation.isGroup || message.senderId === user.id ? author : null,
+        snippet: snippetAround(message.content ?? '', query),
+        time: message.createdAt.hasSame(DateTime.now(), 'day')
+          ? message.createdAt.toFormat('HH:mm')
+          : message.createdAt.toFormat('dd/MM'),
+        url: `/conversations/${conversation.id}?q=${encodeURIComponent(query)}`,
+      }
+    })
+  }
+
   private async buildList(user: User) {
     const memberships = await ConversationMember.query()
       .where('userId', user.id)

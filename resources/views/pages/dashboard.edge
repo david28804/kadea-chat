@@ -2,7 +2,8 @@
   <div class="chatapp {{ active ? 'chatapp--open' : '' }}">
     <aside
       class="convlist"
-      x-data="{ q: '', f: 'all', ok(el) { const t = el.dataset.title.toLowerCase().includes(this.q.toLowerCase()); const g = this.f === 'all' || (this.f === 'unread' && Number(el.dataset.unread) > 0) || (this.f === 'groups' && el.dataset.group === '1'); return t && g } }"
+      x-data="convList"
+      data-search-url="{{ route('messages.search') }}"
     >
       <div class="convlist__head">
         <h1 class="convlist__title"><a href="/">Kadea Chat<sup>*</sup></a></h1>
@@ -51,9 +52,10 @@
         <input
           type="search"
           class="field__input"
-          placeholder="Rechercher une conversation…"
-          aria-label="Rechercher une conversation"
+          placeholder="Rechercher une conversation ou un message…"
+          aria-label="Rechercher une conversation ou un message"
           x-model="q"
+          x-on:input.debounce.300ms="findMessages()"
         />
       </div>
 
@@ -101,6 +103,31 @@
         @else
           <p class="convlist__empty">Aucune conversation pour le moment.</p>
         @end
+
+        {{-- Messages qui contiennent le mot tapé dans la barre de recherche --}}
+        <section class="msgresults" x-show="q.trim().length >= 2" x-cloak aria-live="polite">
+          <h2 class="msgresults__title">Messages</h2>
+          <p class="convlist__empty" x-show="searching && !results.length">Recherche…</p>
+          <p class="convlist__empty" x-show="!searching && searchedFor && !results.length">
+            Aucun message ne contient « <span x-text="searchedFor"></span> ».
+          </p>
+          <template x-for="result in results" x-bind:key="result.id">
+            <a x-bind:href="result.url" class="msgresult">
+              <span class="conv__row">
+                <span class="conv__name" x-text="result.title"></span>
+                <span class="conv__time" x-text="result.time"></span>
+              </span>
+              <span class="msgresult__text">
+                <template x-if="result.author">
+                  <span class="msgresult__author" x-text="result.author + ' : '"></span>
+                </template>
+                <template x-for="(part, index) in parts(result.snippet)" x-bind:key="index">
+                  <span x-bind:class="part.hit && 'msgresult__hit'" x-text="part.text"></span>
+                </template>
+              </span>
+            </a>
+          </template>
+        </section>
       </div>
 
       <div class="convlist__foot">
@@ -145,6 +172,48 @@
             <span class="conv__name">{{ active.title }}</span>
             <span class="conv__preview">{{ active.subtitle }}</span>
           </span>
+          {{-- Recherche dans la conversation : la loupe déplie le champ --}}
+          <form
+            method="GET"
+            action="{{ route('conversations.show', { id: active.id }) }}"
+            class="chatsearch"
+            role="search"
+            x-data="{ open: {{ search ? 'true' : 'false' }} }"
+            x-bind:class="open && 'is-open'"
+          >
+            <input
+              type="search"
+              name="q"
+              value="{{ search }}"
+              placeholder="Rechercher un message…"
+              class="field__input"
+              aria-label="Rechercher dans la conversation"
+              maxlength="100"
+              x-ref="q"
+              x-show="open"
+              x-on:keydown.escape="open = false"
+            />
+            <button
+              type="submit"
+              class="iconbtn"
+              title="Chercher dans tout l'historique"
+              aria-label="Chercher dans tout l'historique"
+              x-show="open"
+              x-cloak
+            >
+              @svg('lucide:search', { width: 16, height: 16 })
+            </button>
+            <button
+              type="button"
+              class="iconbtn"
+              title="Rechercher dans la conversation"
+              aria-label="Rechercher dans la conversation"
+              x-show="!open"
+              x-on:click="open = true; $nextTick(() => $refs.q.focus())"
+            >
+              @svg('lucide:search', { width: 16, height: 16 })
+            </button>
+          </form>
           @if(!active.isGroup && active.otherId && !active.blockedByMe)
             <div class="chathead__actions">
               <details class="blockbox">
@@ -292,12 +361,23 @@
           </dialog>
         @end
 
+        @if(search)
+          <div class="searchbar">
+            <span>
+              {{ messages.length }} {{ messages.length > 1 ? 'résultats' : 'résultat' }} pour « {{ search }} »
+            </span>
+            <a href="{{ route('conversations.show', { id: active.id }) }}" class="il">Effacer la recherche</a>
+          </div>
+        @end
+
+        {{-- Pendant une recherche, les nouveaux messages n'arrivent pas en direct --}}
         <div
           class="msgs"
           data-conversation-id="{{ active.id }}"
           data-user-id="{{ auth.user.id }}"
           data-group="{{ active.isGroup ? '1' : '0' }}"
-          data-live="1"
+          data-live="{{ search ? '0' : '1' }}"
+          data-search="{{ search }}"
           x-data
           x-init="$el.scrollTop = $el.scrollHeight"
         >
@@ -354,7 +434,9 @@
               </div>
             @end
           @else
-            <p class="msgs__empty">Aucun message pour le moment. Écrivez le premier !</p>
+            <p class="msgs__empty">
+              {{ search ? 'Aucun message ne correspond à votre recherche.' : 'Aucun message pour le moment. Écrivez le premier !' }}
+            </p>
           @end
         </div>
 

@@ -41,6 +41,9 @@ router.post('reset-password/:token', [controllers.PasswordResets, 'update']).as(
 router
   .group(() => {
     router.get('/dashboard', [controllers.Conversations, 'index']).as('dashboard')
+    router
+      .get('/search/messages', [controllers.Conversations, 'searchMessages'])
+      .as('messages.search')
     router.get('/conversations/:id', [controllers.Conversations, 'show']).as('conversations.show')
     router.post('/conversations', [controllers.Conversations, 'store']).as('conversations.store')
     router.post('/conversations/:id/messages', [controllers.Messages, 'store']).as('messages.store')

@@ -61,4 +61,64 @@ Alpine.data('newChat', function () {
   }
 })
 
+// Liste des conversations : filtres, et recherche d'un mot dans tous les messages
+Alpine.data('convList', function () {
+  return {
+    q: '',
+    f: 'all',
+    results: [],
+    searching: false,
+    searchedFor: '',
+
+    // Une conversation reste visible si son nom correspond et qu'elle passe le filtre
+    ok(el) {
+      const title = el.dataset.title.toLowerCase().includes(this.q.trim().toLowerCase())
+      const filter =
+        this.f === 'all' ||
+        (this.f === 'unread' && Number(el.dataset.unread) > 0) ||
+        (this.f === 'groups' && el.dataset.group === '1')
+      return title && filter
+    },
+
+    // Appelée pendant la frappe (avec un petit délai) : cherche le mot dans les messages
+    async findMessages() {
+      const query = this.q.trim()
+      if (query.length < 2) {
+        this.results = []
+        this.searchedFor = ''
+        return
+      }
+      this.searching = true
+      try {
+        const url = `${this.$root.dataset.searchUrl}?q=${encodeURIComponent(query)}`
+        const response = await fetch(url, { headers: { Accept: 'application/json' } })
+        const results = response.ok ? await response.json() : []
+        // On ignore une réponse arrivée après une nouvelle frappe
+        if (query !== this.q.trim()) return
+        this.results = results
+        this.searchedFor = query
+      } finally {
+        this.searching = false
+      }
+    },
+
+    // Découpe l'extrait en morceaux pour surligner le mot (affiché avec x-text, sans HTML)
+    parts(text) {
+      const needle = this.searchedFor.toLowerCase()
+      const lower = text.toLowerCase()
+      const parts = []
+      let from = 0
+      let at = needle ? lower.indexOf(needle) : -1
+      while (at !== -1) {
+        if (at > from) parts.push({ text: text.slice(from, at), hit: false })
+        parts.push({ text: text.slice(at, at + needle.length), hit: true })
+        from = at + needle.length
+        at = lower.indexOf(needle, from)
+      }
+      if (from < text.length) parts.push({ text: text.slice(from), hit: false })
+      return parts
+    },
+  }
+})
+
 Alpine.start()

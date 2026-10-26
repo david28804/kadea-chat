@@ -24,3 +24,9 @@ yarn-error.log
 
 # Platform specific
 .DS_Store
+
+# Fichiers envoyés par les utilisateurs (photos de profil, pièces jointes)
+public/uploads/*
+!public/uploads/.gitkeep
+storage/uploads/*
+!storage/uploads/.gitkeep

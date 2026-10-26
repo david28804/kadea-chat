@@ -18,6 +18,7 @@ export type ScannedRoutes = {
     'password.edit': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'password.update': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'dashboard': { paramsTuple?: []; params?: {} }
+    'messages.search': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -48,6 +49,7 @@ export type ScannedRoutes = {
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.edit': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'dashboard': { paramsTuple?: []; params?: {} }
+    'messages.search': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.edit': { paramsTuple?: []; params?: {} }
@@ -61,6 +63,7 @@ export type ScannedRoutes = {
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.edit': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'dashboard': { paramsTuple?: []; params?: {} }
+    'messages.search': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.edit': { paramsTuple?: []; params?: {} }
