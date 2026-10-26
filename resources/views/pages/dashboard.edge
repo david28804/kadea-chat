@@ -5,7 +5,46 @@
       x-data="{ q: '', f: 'all', ok(el) { const t = el.dataset.title.toLowerCase().includes(this.q.toLowerCase()); const g = this.f === 'all' || (this.f === 'unread' && Number(el.dataset.unread) > 0) || (this.f === 'groups' && el.dataset.group === '1'); return t && g } }"
     >
       <div class="convlist__head">
-        <h1 class="convlist__title">Kadea Chat</h1>
+        <h1 class="convlist__title"><a href="/">Kadea Chat<sup>*</sup></a></h1>
+        {{--
+          Navigation principale : ajoute une entrée ici pour chaque nouvelle zone.
+          Une entrée avec `step` ouvre la fenêtre « Nouveau » au lieu d'une page.
+        --}}
+        @let(nav = [
+          { label: 'Conversations', route: 'dashboard', icon: 'lucide:message-circle' },
+          { label: 'Contacts', step: 'private', icon: 'lucide:user-plus' },
+          { label: 'Groupes', step: 'group', icon: 'lucide:users' },
+          { label: 'Paramètres', route: 'profile.edit', icon: 'lucide:settings' },
+        ])
+        <nav class="convnav" aria-label="Navigation principale">
+          @each(item in nav)
+            @if(item.step)
+              <button
+                type="button"
+                class="convnav__item"
+                title="{{ item.label }}"
+                x-on:click="$dispatch('newchat', '{{ item.step }}')"
+              >
+                @svg(item.icon, { width: 20, height: 20 })
+                <span class="sr-only">{{ item.label }}</span>
+              </button>
+            @else
+              @navLink({ route: item.route, class: 'convnav__item', title: item.label })
+                @svg(item.icon, { width: 20, height: 20 })
+                <span class="sr-only">{{ item.label }}</span>
+              @end
+            @end
+          @end
+          <button
+            type="button"
+            class="convnav__item convnav__item--new"
+            title="Nouveau"
+            aria-label="Nouvelle conversation ou nouveau groupe"
+            x-on:click="$dispatch('newchat', 'choice')"
+          >
+            @svg('lucide:plus', { width: 20, height: 20 })
+          </button>
+        </nav>
       </div>
 
       <div class="convlist__search">
@@ -65,10 +104,24 @@
       </div>
 
       <div class="convlist__foot">
-        <a href="{{ route('conversations.create') }}" class="btn btn--primary">
-          @svg('lucide:plus', { width: 15, height: 15 })
-          Nouvelle conversation
-        </a>
+        <div class="convme">
+          <a href="{{ route('profile.edit') }}" class="convme__link" title="Mon profil">
+            <span class="conv__avatar me-avatar is-online">
+              @if(auth.user?.avatar)
+                <img src="/{{ auth.user.avatar }}" alt="" class="conv__img" />
+              @else
+                {{ auth.user?.initials }}
+              @end
+            </span>
+            <span class="convme__name">{{ auth.user?.fullName ?? auth.user?.email }}</span>
+          </a>
+          @!themeToggle()
+          @form({ route: 'session.destroy', method: 'POST' })
+            <button type="submit" class="iconbtn" aria-label="Se déconnecter" title="Se déconnecter">
+              @svg('lucide:log-out', { width: 16, height: 16 })
+            </button>
+          @end
+        </div>
       </div>
     </aside>
 
@@ -95,9 +148,8 @@
           @if(!active.isGroup && active.otherId && !active.blockedByMe)
             <div class="chathead__actions">
               <details class="blockbox">
-                <summary class="btn btn--secondary btn--sm">
+                <summary class="iconbtn blockbox__btn" title="Bloquer" aria-label="Bloquer cette personne">
                   @svg('lucide:ban', { width: 14, height: 14 })
-                  Bloquer
                 </summary>
                 @form({
                   route: 'users.block',
@@ -247,7 +299,7 @@
               maxlength="2000"
               x-on:keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); $el.form.requestSubmit() }"
             ></textarea>
-            <button type="submit" class="btn btn--primary" x-bind:disabled="submitting">
+            <button type="submit" class="btn btn--primary composer__send" x-bind:disabled="submitting">
               @svg('lucide:send', { width: 15, height: 15 })
               Envoyer
             </button>
@@ -260,9 +312,145 @@
           </div>
           <h1>Vos conversations commencent ici</h1>
           <p>Sélectionnez une conversation dans la liste, ou démarrez-en une nouvelle.</p>
-          <a href="{{ route('conversations.create') }}" class="btn btn--primary">Nouvelle conversation</a>
+          <button type="button" class="btn btn--primary" x-data x-on:click="$dispatch('newchat', 'choice')">
+            Nouvelle conversation
+          </button>
         </div>
       @end
     </section>
+
+    {{-- Fenêtre « Nouveau » : conversation privée ou groupe, sans changer de page --}}
+    <dialog
+      class="newchat"
+      x-data="newChat"
+      data-open-step="{{ flashMessages.get('newchat') ?? (flashMessages.has('inputErrorsBag.name') ? 'group' : '') }}"
+      aria-labelledby="newchat-title"
+      x-on:newchat.window="open($event.detail)"
+      x-on:click="$event.target === $el && close()"
+    >
+      <div class="newchat__box">
+        <div class="newchat__head">
+          <button
+            type="button"
+            class="iconbtn"
+            aria-label="Retour"
+            x-show="step !== 'choice'"
+            x-on:click="step = 'choice'"
+          >
+            @svg('lucide:arrow-left', { width: 16, height: 16 })
+          </button>
+          <h2 id="newchat-title" class="newchat__title">
+            <span x-show="step === 'choice'">Nouveau</span>
+            <span x-show="step === 'private'">Nouvelle conversation</span>
+            <span x-show="step === 'group'">Créer un groupe</span>
+          </h2>
+          <button type="button" class="iconbtn" aria-label="Fermer" x-on:click="close()">
+            @svg('lucide:x', { width: 16, height: 16 })
+          </button>
+        </div>
+
+        <div class="newchat__step" x-show="step === 'choice'">
+          <button type="button" class="newchat__option" x-on:click="step = 'private'">
+            <span class="newchat__icon">
+              @svg('lucide:message-circle', { width: 20, height: 20 })
+            </span>
+            <span class="newchat__text">
+              <span class="newchat__label">Nouvelle conversation</span>
+              <span class="newchat__sub">Discuter en privé avec une personne</span>
+            </span>
+          </button>
+          <button type="button" class="newchat__option" x-on:click="step = 'group'">
+            <span class="newchat__icon">
+              @svg('lucide:users', { width: 20, height: 20 })
+            </span>
+            <span class="newchat__text">
+              <span class="newchat__label">Créer un groupe</span>
+              <span class="newchat__sub">Discuter à plusieurs</span>
+            </span>
+          </button>
+        </div>
+
+        <div class="newchat__step" x-show="step === 'private'">
+          <input
+            type="search"
+            class="field__input"
+            placeholder="Rechercher par nom ou e-mail…"
+            aria-label="Rechercher une personne"
+            x-model="q"
+          />
+          <div class="newchat__list">
+            @each(person in people)
+              @form({ route: 'conversations.store', method: 'POST' })
+                <input type="hidden" name="userId" value="{{ person.id }}" />
+                <button
+                  type="submit"
+                  class="person"
+                  data-search="{{ `${person.name} ${person.email}`.toLowerCase() }}"
+                  x-show="match($el)"
+                >
+                  <span class="conv__avatar">
+                    @if(person.avatar)
+                      <img src="/{{ person.avatar }}" alt="" class="conv__img" />
+                    @else
+                      {{ person.initials }}
+                    @end
+                  </span>
+                  <span class="person__text">
+                    <span class="conv__name">{{ person.name }}</span>
+                    <span class="conv__preview">{{ person.email }}</span>
+                  </span>
+                </button>
+              @end
+            @else
+              <p class="convlist__empty">
+                Aucune personne trouvée. Une personne apparaît ici après avoir créé un compte et confirmé son e-mail.
+              </p>
+            @end
+          </div>
+        </div>
+
+        <div class="newchat__step" x-show="step === 'group'">
+          @form({ route: 'groups.store', method: 'POST', class: 'newchat__form' })
+            @field.root({ name: 'name' })
+              @!field.label({ text: 'Nom du groupe' })
+              @!input.control({ type: 'text', placeholder: 'Ex. Promo Kadea 2026' })
+              @!field.error()
+            @end
+            <input
+              type="search"
+              class="field__input"
+              placeholder="Rechercher un membre…"
+              aria-label="Rechercher un membre"
+              x-model="q"
+            />
+            <div class="newchat__list">
+              @each(person in people)
+                <label
+                  class="person"
+                  data-search="{{ `${person.name} ${person.email}`.toLowerCase() }}"
+                  x-show="match($el)"
+                >
+                  <input type="checkbox" name="members" value="{{ person.id }}" />
+                  <span class="conv__avatar">
+                    @if(person.avatar)
+                      <img src="/{{ person.avatar }}" alt="" class="conv__img" />
+                    @else
+                      {{ person.initials }}
+                    @end
+                  </span>
+                  <span class="person__text">
+                    <span class="conv__name">{{ person.name }}</span>
+                    <span class="conv__preview">{{ person.email }}</span>
+                  </span>
+                </label>
+              @else
+                <p class="convlist__empty">Aucune personne disponible pour le moment.</p>
+              @end
+            </div>
+            @!button({ text: 'Créer le groupe', type: 'submit', block: true })
+          @end
+        </div>
+      </div>
+    </dialog>
   </div>
 @end

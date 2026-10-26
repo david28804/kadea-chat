@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html
-  lang="en-us"
+  lang="fr"
   data-theme="{{
     request.plainCookie('app_theme', {
-      defaultValue: 'light',
+      defaultValue: 'dark',
       encoded: false,
     })
   }}"
@@ -11,31 +11,56 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AdonisJS — Starter Kit</title>
+    <title>Kadea Chat — La messagerie de votre équipe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&family=Instrument+Serif:ital@1&display=swap"
+    />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('dumper')
   </head>
-  <body>
-    <header class="header header--floating">
-      <div class="header__inner">
-        @!logo({ size: 28 })
-        <div class="header__right">
-          @!themeToggle()
-          @if(auth.user)
-            @link({ route: 'dashboard', class: 'btn btn--primary btn--sm' })
-              Dashboard
-            @end
-          @else
-            @link({ route: 'session.create', class: 'btn btn--ghost btn--sm' })
-              Sign in
-            @end
-            @link({ route: 'new_account.create', class: 'btn btn--primary btn--sm' })
-              Get started
-            @end
+  <body class="landing">
+    {{-- Menu : pilule centrée sur ordinateur, menu burger sur téléphone --}}
+    <nav
+      class="lnav"
+      aria-label="Navigation"
+      x-data="{ open: false }"
+      x-bind:class="open && 'is-open'"
+      x-on:keydown.escape.window="open = false"
+    >
+      <a href="/" class="lnav__brand">Kadea Chat<sup>*</sup></a>
+      <button
+        type="button"
+        class="lnav__burger"
+        aria-controls="lnav-links"
+        x-bind:aria-expanded="open"
+        x-bind:aria-label="open ? 'Fermer le menu' : 'Ouvrir le menu'"
+        x-on:click="open = !open"
+      >
+        <span x-show="!open">
+          @svg('lucide:menu', { width: 22, height: 22 })
+        </span>
+        <span x-show="open" x-cloak>
+          @svg('lucide:x', { width: 22, height: 22 })
+        </span>
+      </button>
+      <div id="lnav-links" class="lnav__links" x-on:click="if ($event.target.closest('a')) open = false">
+        <a href="#a-propos">À propos</a>
+        <a href="#fonctionnalites">Fonctionnalités</a>
+        @if(auth.user)
+          @form({ route: 'session.destroy', method: 'POST', class: 'lnav__form' })
+            <button type="submit">Se déconnecter</button>
           @end
-        </div>
+        @else
+          @link({ route: 'session.create' })
+            Se connecter
+          @end
+        @end
       </div>
-    </header>
+      @!themeToggle()
+    </nav>
     {{{ await $slots.main() }}}
     @include('partials/flash_alerts')
   </body>

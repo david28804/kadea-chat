@@ -11,36 +11,7 @@ const groupValidator = vine.compile(
   })
 )
 
-function initialsOf(name: string) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0].toUpperCase())
-    .join('')
-}
-
 export default class GroupsController {
-  /**
-   * Page "Créer un groupe"
-   */
-  async create({ auth, view }: HttpContext) {
-    const me = auth.getUserOrFail()
-
-    const users = await User.query()
-      .whereNot('id', me.id)
-      .whereNotNull('emailVerifiedAt')
-      .orderBy('fullName', 'asc')
-      .limit(100)
-
-    const people = users.map((person) => {
-      const name = person.fullName ?? person.email
-      return { id: person.id, name, email: person.email, initials: initialsOf(name) }
-    })
-
-    return view.render('pages/groups/new', { people })
-  }
-
   /**
    * Crée le groupe et ses membres
    */
@@ -59,7 +30,8 @@ export default class GroupsController {
 
     if (members.length === 0) {
       session.flash('error', 'Choisissez au moins un membre pour le groupe.')
-      return response.redirect().toRoute('groups.create')
+      session.flash('newchat', 'group')
+      return response.redirect().toRoute('dashboard')
     }
 
     const group = await Conversation.create({

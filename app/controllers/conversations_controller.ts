@@ -101,7 +101,15 @@ export default class ConversationsController {
     const user = auth.getUserOrFail()
     const conversations = await this.buildList(user)
 
-    return view.render('pages/dashboard', { conversations, active: null, messages: [], search: '' })
+    const people = await this.buildPeople(user)
+
+    return view.render('pages/dashboard', {
+      conversations,
+      people,
+      active: null,
+      messages: [],
+      search: '',
+    })
   }
 
   async show({ auth, params, request, view, response }: HttpContext) {
@@ -230,30 +238,31 @@ export default class ConversationsController {
 
     const conversations = await this.buildList(user)
 
-    return view.render('pages/dashboard', { conversations, active, messages, search })
+    const people = await this.buildPeople(user)
+
+    return view.render('pages/dashboard', { conversations, people, active, messages, search })
   }
 
-  async create({ auth, request, view }: HttpContext) {
-    const me = auth.getUserOrFail()
-    const q = String(request.input('q', '')).trim()
-
+  /**
+   * Personnes proposées dans la fenêtre « Nouveau » (conversation ou groupe)
+   */
+  private async buildPeople(user: User) {
     const users = await User.query()
-      .whereNot('id', me.id)
+      .whereNot('id', user.id)
       .whereNotNull('emailVerifiedAt')
-      .if(q, (query) => {
-        query.where((group) => {
-          group.whereILike('fullName', `%${q}%`).orWhereILike('email', `%${q}%`)
-        })
-      })
       .orderBy('fullName', 'asc')
-      .limit(50)
+      .limit(100)
 
-    const people = users.map((person) => {
+    return users.map((person) => {
       const name = person.fullName ?? person.email
-      return { id: person.id, name, email: person.email, initials: initialsOf(name) }
+      return {
+        id: person.id,
+        name,
+        email: person.email,
+        initials: initialsOf(name),
+        avatar: person.avatar ?? null,
+      }
     })
-
-    return view.render('pages/conversations/new', { people, q })
   }
 
   async store({ auth, request, response, session }: HttpContext) {
@@ -262,13 +271,13 @@ export default class ConversationsController {
 
     if (!Number.isInteger(otherId) || otherId === me.id) {
       session.flash('error', 'Utilisateur invalide.')
-      return response.redirect().toRoute('conversations.create')
+      return response.redirect().toRoute('dashboard')
     }
 
     const other = await User.find(otherId)
     if (!other) {
       session.flash('error', 'Utilisateur introuvable.')
-      return response.redirect().toRoute('conversations.create')
+      return response.redirect().toRoute('dashboard')
     }
 
     const directKey = `${Math.min(me.id, other.id)}-${Math.max(me.id, other.id)}`

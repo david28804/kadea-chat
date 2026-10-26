@@ -1,9 +1,10 @@
+{{-- Pages de connexion : même style que la page d'accueil (noir, crème) --}}
 <!DOCTYPE html>
 <html
   lang="fr"
   data-theme="{{
     request.plainCookie('app_theme', {
-      defaultValue: 'light',
+      defaultValue: 'dark',
       encoded: false,
     })
   }}"
@@ -12,46 +13,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Kadea Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&family=Instrument+Serif:ital@1&display=swap"
+    />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('dumper')
   </head>
-  <body>
-    <div class="auth">
-      <div class="auth__form-col">
-        <a href="/" aria-label="Kadea Chat" style="display: inline-flex; color: var(--ink);">
-          <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true">
-            <defs>
-              <mask id="auth-k" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
-                <rect width="64" height="64" fill="#fff" />
-                <g transform="translate(-1.5 0)">
-                  <rect x="19" y="13" width="7" height="30" fill="#000" />
-                  <path d="M45 15L34 28L45 41" fill="none" stroke="#000" stroke-width="7" stroke-linejoin="miter" stroke-miterlimit="10" />
-                </g>
-              </mask>
-            </defs>
-            <path
-              mask="url(#auth-k)"
-              fill="currentColor"
-              d="M18 4H46A14 14 0 0 1 60 18V38A14 14 0 0 1 46 52H30L18 62V52A14 14 0 0 1 4 38V18A14 14 0 0 1 18 4Z"
-            />
-          </svg>
+  <body class="landing">
+    <div class="lauth">
+      <div class="lauth__col">
+        <a href="/" class="lauth__brand">Kadea Chat<sup>*</sup></a>
+        <div class="lauth__wrap">{{{ await $slots.main() }}}</div>
+        <a href="/" class="lauth__back">
+          @svg('lucide:arrow-left', { width: 14, height: 14 })
+          Retour à l'accueil
         </a>
-        <div class="auth__form-wrap">{{{ await $slots.main() }}}</div>
-        <div style="height: 20px;"></div>
       </div>
-
-      <aside class="auth__aside">
-        <div class="auth__aside-top">
-          @!themeToggle()
-        </div>
-
-        <div>
-          <p class="auth__quote">Les bonnes idées commencent par une conversation.</p>
-          <p class="pitch__p">
-            Retrouvez votre équipe, partagez vos idées et faites avancer vos projets, un message à la fois.
-          </p>
-        </div>
-      </aside>
     </div>
     @include('partials/flash_alerts')
   </body>

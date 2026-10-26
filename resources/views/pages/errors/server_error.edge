@@ -1,19 +1,13 @@
-@marketing()
-  <div class="home">
-    <article class="prose-card">
-      <div class="pc-top">
-        <span class="pc-status mono tag" style="color: #c0392b;">
-          <span class="dot"></span>
-          {{ error.code || 500 }}
-        </span>
-      </div>
-      <div class="pc-lead">
-        <span>Something broke.</span>
-        <em>The server hit an unexpected error.</em>
-      </div>
-      <p class="pc-para">
-        Try again in a moment. If the problem persists, check the server logs for the underlying exception.
-      </p>
-    </article>
-  </div>
+@layouts.marketing()
+  <main class="lerror">
+    <p class="lstory__label">Erreur 500</p>
+    <h1 class="lerror__title">Un problème est survenu, <em>réessayez dans un instant.</em></h1>
+    <p class="lerror__text">Le serveur n'a pas pu traiter votre demande.</p>
+    <a href="/" class="lpill">
+      Retour à l'accueil
+      <span class="lpill__arrow">
+        @svg('lucide:arrow-right', { width: 18, height: 18 })
+      </span>
+    </a>
+  </main>
 @end

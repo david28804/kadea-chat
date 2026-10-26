@@ -18,7 +18,6 @@ export type ScannedRoutes = {
     'password.edit': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'password.update': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'dashboard': { paramsTuple?: []; params?: {} }
-    'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -29,7 +28,6 @@ export type ScannedRoutes = {
     'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
-    'groups.create': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
     'profile.edit': { paramsTuple?: []; params?: {} }
     'profile.update': { paramsTuple?: []; params?: {} }
@@ -47,10 +45,8 @@ export type ScannedRoutes = {
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.edit': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'dashboard': { paramsTuple?: []; params?: {} }
-    'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'groups.create': { paramsTuple?: []; params?: {} }
     'profile.edit': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -62,10 +58,8 @@ export type ScannedRoutes = {
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.edit': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'dashboard': { paramsTuple?: []; params?: {} }
-    'conversations.create': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'groups.create': { paramsTuple?: []; params?: {} }
     'profile.edit': { paramsTuple?: []; params?: {} }
   }
   POST: {

@@ -1,20 +1,11 @@
-{{--
-  Navigation principale (barre verticale à gauche).
-  Ajoute une entrée ici pour chaque nouvelle zone de l'application.
---}}
-@let(nav = [
-  { label: 'Conversations', route: 'dashboard', icon: 'lucide:message-circle' },
-  { label: 'Contacts', route: 'conversations.create', icon: 'lucide:user-plus' },
-  { label: 'Groupes', route: 'groups.create', icon: 'lucide:users' },
-  { label: 'Paramètres', route: 'profile.edit', icon: 'lucide:settings' },
-])
+{{-- Application (conversations, profil) : thème de l'accueil, sombre par défaut, clair au choix --}}
 @let(pageTitle = $props.get('title'))
 <!DOCTYPE html>
 <html
   lang="fr"
   data-theme="{{
     request.plainCookie('app_theme', {
-      defaultValue: 'light',
+      defaultValue: 'dark',
       encoded: false,
     })
   }}"
@@ -24,60 +15,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {{ csrfMeta() }}
     <title>{{ pageTitle ? `${pageTitle} - Kadea Chat` : 'Kadea Chat' }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap"
+    />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('dumper')
   </head>
-  <body>
+  <body class="kc">
     <div class="shell" data-user-id="{{ auth.user?.id }}">
-      <nav class="rail" aria-label="Navigation principale">
-        <a href="/" class="rail__logo" aria-label="Kadea Chat">
-          <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
-            <defs>
-              <mask id="rail-k" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
-                <rect width="64" height="64" fill="#fff" />
-                <g transform="translate(-1.5 0)">
-                  <rect x="19" y="13" width="7" height="30" fill="#000" />
-                  <path d="M45 15L34 28L45 41" fill="none" stroke="#000" stroke-width="7" stroke-linejoin="miter" stroke-miterlimit="10" />
-                </g>
-              </mask>
-            </defs>
-            <path
-              mask="url(#rail-k)"
-              fill="currentColor"
-              d="M18 4H46A14 14 0 0 1 60 18V38A14 14 0 0 1 46 52H30L18 62V52A14 14 0 0 1 4 38V18A14 14 0 0 1 18 4Z"
-            />
-          </svg>
-        </a>
-
-        @each(item in nav)
-          @navLink({ route: item.route, class: 'rail__item' })
-            @svg(item.icon, { width: 22, height: 22 })
-            <span class="sr-only">{{ item.label }}</span>
-          @end
-        @end
-
-        <div class="rail__bottom">
-          <a
-            href="{{ route('profile.edit') }}"
-            class="conv__avatar me-avatar is-online"
-            title="{{ auth.user?.fullName ?? auth.user?.email }} (vous)"
-            aria-label="Mon profil"
-          >
-            @if(auth.user?.avatar)
-              <img src="/{{ auth.user.avatar }}" alt="" class="conv__img" />
-            @else
-              {{ auth.user?.initials }}
-            @end
-          </a>
-          @!themeToggle()
-          @form({ route: 'session.destroy', method: 'POST' })
-            <button type="submit" class="iconbtn" aria-label="Se déconnecter" title="Se déconnecter">
-              @svg('lucide:log-out', { width: 16, height: 16 })
-            </button>
-          @end
-        </div>
-      </nav>
-
       <div class="shell__main">{{{ await $slots.main() }}}</div>
     </div>
     @include('partials/flash_alerts')

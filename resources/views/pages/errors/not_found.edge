@@ -1,16 +1,13 @@
-@marketing()
-  <div class="home">
-    <article class="prose-card">
-      <div class="pc-top">
-        <span class="pc-status mono tag" style="color: var(--subtle);">
-          <span class="dot"></span>
-          404
-        </span>
-      </div>
-      <div class="pc-lead"><span>Not found.</span> <em>That route hasn't been built yet.</em></div>
-      <p class="pc-para">
-        The page you tried to reach doesn't exist. Check the URL or head back home.
-      </p>
-    </article>
-  </div>
+@layouts.marketing()
+  <main class="lerror">
+    <p class="lstory__label">Erreur 404</p>
+    <h1 class="lerror__title">Page introuvable, <em>elle n'existe pas.</em></h1>
+    <p class="lerror__text">Vérifiez l'adresse ou revenez à l'accueil.</p>
+    <a href="/" class="lpill">
+      Retour à l'accueil
+      <span class="lpill__arrow">
+        @svg('lucide:arrow-right', { width: 18, height: 18 })
+      </span>
+    </a>
+  </main>
 @end

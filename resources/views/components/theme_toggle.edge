@@ -1,5 +1,5 @@
 @let(currentTheme = request.plainCookie('app_theme', {
-  defaultValue: 'light',
+  defaultValue: 'dark',
   encoded: false,
 }))
 
@@ -8,8 +8,8 @@
   class="iconbtn"
   data-initial-theme="{{ currentTheme }}"
   x-data="themeToggle"
-  x-bind:aria-label="theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
-  x-bind:title="theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+  x-bind:aria-label="theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre'"
+  x-bind:title="theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre'"
   x-on:click="toggle"
 >
   @svg('lucide:sun', {
