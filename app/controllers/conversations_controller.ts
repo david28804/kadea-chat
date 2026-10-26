@@ -167,6 +167,23 @@ export default class ConversationsController {
       blockedByMe,
       blockedMe,
       online: !conversation.isGroup && other ? PresenceService.isOnline(other.userId) : false,
+      iAmAdmin: conversation.isGroup && membership.isAdmin,
+      // Membres du groupe : administrateurs d'abord, puis par nom
+      members: conversation.isGroup
+        ? conversation.members
+            .map((member) => {
+              const name = member.user.fullName ?? member.user.email
+              return {
+                userId: member.userId,
+                name,
+                initials: initialsOf(name),
+                avatar: member.user.avatar ?? null,
+                isAdmin: member.isAdmin,
+                isMe: member.userId === user.id,
+              }
+            })
+            .sort((a, b) => Number(b.isAdmin) - Number(a.isAdmin) || a.name.localeCompare(b.name))
+        : [],
     }
 
     const rows = await Message.query()
@@ -240,7 +257,18 @@ export default class ConversationsController {
 
     const people = await this.buildPeople(user)
 
-    return view.render('pages/dashboard', { conversations, people, active, messages, search })
+    // Personnes qu'un administrateur peut encore ajouter au groupe
+    const memberIds = new Set(active.members.map((member) => member.userId))
+    const addable = active.iAmAdmin ? people.filter((person) => !memberIds.has(person.id)) : []
+
+    return view.render('pages/dashboard', {
+      conversations,
+      people,
+      addable,
+      active,
+      messages,
+      search,
+    })
   }
 
   /**

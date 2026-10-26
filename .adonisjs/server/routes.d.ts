@@ -29,6 +29,9 @@ export type ScannedRoutes = {
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
+    'groups.members.add': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.members.remove': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'userId': ParamValue} }
+    'groups.leave': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.edit': { paramsTuple?: []; params?: {} }
     'profile.update': { paramsTuple?: []; params?: {} }
     'profile.password': { paramsTuple?: []; params?: {} }
@@ -78,6 +81,9 @@ export type ScannedRoutes = {
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
+    'groups.members.add': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.members.remove': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'userId': ParamValue} }
+    'groups.leave': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.update': { paramsTuple?: []; params?: {} }
     'profile.password': { paramsTuple?: []; params?: {} }
     'profile.avatar': { paramsTuple?: []; params?: {} }

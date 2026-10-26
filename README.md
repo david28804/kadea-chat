@@ -236,6 +236,6 @@ _À compléter après la mise en ligne._ Points d'attention :
 | Profil, photo recadrée, thème Kadea | Terminé |
 | Statuts envoyé / reçu / lu | À faire |
 | Partage de fichiers et d'images | À faire |
-| Gestion de groupe (ajout, retrait, quitter) | À faire |
+| Gestion de groupe (ajout, retrait, quitter) | Terminé |
 | Recherche dans une conversation (interface) | À faire |
 | Déploiement | À faire |

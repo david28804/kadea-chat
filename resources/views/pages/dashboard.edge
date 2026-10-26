@@ -162,7 +162,135 @@
               </details>
             </div>
           @end
+          @if(active.isGroup)
+            <div class="chathead__actions">
+              <button
+                type="button"
+                class="iconbtn"
+                title="Membres du groupe"
+                aria-label="Membres du groupe"
+                x-data
+                x-on:click="$dispatch('groupinfo')"
+              >
+                @svg('lucide:users', { width: 16, height: 16 })
+              </button>
+            </div>
+          @end
         </header>
+
+        @if(active.isGroup)
+          {{-- Membres du groupe : voir, ajouter, retirer, quitter --}}
+          <dialog
+            class="newchat"
+            aria-labelledby="groupinfo-title"
+            x-data="{ q: '', match(el) { return el.dataset.search.includes(this.q.trim().toLowerCase()) } }"
+            x-on:groupinfo.window="q = ''; $el.showModal()"
+            x-on:click="$event.target === $el && $el.close()"
+          >
+            <div class="newchat__box">
+              <div class="newchat__head">
+                <h2 id="groupinfo-title" class="newchat__title">
+                  Membres
+                  <span class="groupinfo__count">{{ active.members.length }}</span>
+                </h2>
+                <button type="button" class="iconbtn" aria-label="Fermer" x-on:click="$root.close()">
+                  @svg('lucide:x', { width: 16, height: 16 })
+                </button>
+              </div>
+
+              <div class="newchat__list">
+                @each(member in active.members)
+                  <div class="person groupinfo__member">
+                    <span class="conv__avatar">
+                      @if(member.avatar)
+                        <img src="/{{ member.avatar }}" alt="" class="conv__img" />
+                      @else
+                        {{ member.initials }}
+                      @end
+                    </span>
+                    <span class="person__text">
+                      <span class="conv__name">{{ member.name }}{{ member.isMe ? ' (vous)' : '' }}</span>
+                      <span class="conv__preview">{{ member.isAdmin ? 'Administrateur' : 'Membre' }}</span>
+                    </span>
+                    @if(active.iAmAdmin && !member.isMe)
+                      @form({
+                        route: 'groups.members.remove',
+                        routeParams: { id: active.id, userId: member.userId },
+                        method: 'POST',
+                        class: 'groupinfo__remove',
+                        'x-on:submit': "confirm('Retirer cette personne du groupe ?') || $event.preventDefault()",
+                      })
+                        <button type="submit" class="btn btn--secondary btn--sm">Retirer</button>
+                      @end
+                    @end
+                  </div>
+                @end
+              </div>
+
+              @if(active.iAmAdmin)
+                <details class="groupinfo__add">
+                  <summary class="btn btn--secondary btn--sm">
+                    @svg('lucide:user-plus', { width: 14, height: 14 })
+                    Ajouter des membres
+                  </summary>
+                  @if(addable.length)
+                    @form({
+                      route: 'groups.members.add',
+                      routeParams: { id: active.id },
+                      method: 'POST',
+                      class: 'newchat__form',
+                    })
+                      <input
+                        type="search"
+                        class="field__input"
+                        placeholder="Rechercher une personne…"
+                        aria-label="Rechercher une personne à ajouter"
+                        x-model="q"
+                      />
+                      <div class="newchat__list">
+                        @each(person in addable)
+                          <label
+                            class="person"
+                            data-search="{{ `${person.name} ${person.email}`.toLowerCase() }}"
+                            x-show="match($el)"
+                          >
+                            <input type="checkbox" name="members" value="{{ person.id }}" />
+                            <span class="conv__avatar">
+                              @if(person.avatar)
+                                <img src="/{{ person.avatar }}" alt="" class="conv__img" />
+                              @else
+                                {{ person.initials }}
+                              @end
+                            </span>
+                            <span class="person__text">
+                              <span class="conv__name">{{ person.name }}</span>
+                              <span class="conv__preview">{{ person.email }}</span>
+                            </span>
+                          </label>
+                        @end
+                      </div>
+                      @!button({ text: 'Ajouter au groupe', type: 'submit', block: true })
+                    @end
+                  @else
+                    <p class="convlist__empty">Tout le monde fait déjà partie du groupe.</p>
+                  @end
+                </details>
+              @end
+
+              @form({
+                route: 'groups.leave',
+                routeParams: { id: active.id },
+                method: 'POST',
+                'x-on:submit': "confirm('Quitter ce groupe ? Vous ne verrez plus ses messages.') || $event.preventDefault()",
+              })
+                <button type="submit" class="btn btn--ghost btn--block groupinfo__leave">
+                  @svg('lucide:log-out', { width: 15, height: 15 })
+                  Quitter le groupe
+                </button>
+              @end
+            </div>
+          </dialog>
+        @end
 
         <div
           class="msgs"

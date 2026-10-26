@@ -3521,3 +3521,46 @@ body.kc .chatpane {
   border-color: #1c1b17;
   color: #e5e3d3;
 }
+
+/* ==========================================================================
+   Fenêtre « Membres » d'un groupe
+   ========================================================================== */
+.groupinfo__count {
+  margin-left: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.groupinfo__member {
+  cursor: default;
+}
+.groupinfo__member .person__text {
+  flex: 1;
+}
+.groupinfo__remove {
+  flex: none;
+}
+.groupinfo__add {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.groupinfo__add > summary {
+  list-style: none;
+  align-self: flex-start;
+  cursor: pointer;
+}
+.groupinfo__add > summary::-webkit-details-marker {
+  display: none;
+}
+.groupinfo__add[open] > summary {
+  margin-bottom: 10px;
+}
+.groupinfo__leave {
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.groupinfo__leave:hover {
+  color: var(--ink);
+}

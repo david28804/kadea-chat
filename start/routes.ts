@@ -52,6 +52,13 @@ router
     router.post('/users/:id/unblock', [controllers.Blocks, 'destroy']).as('users.unblock')
     router.post('/presence/ping', [controllers.Presences, 'ping']).as('presence.ping')
     router.post('/groups', [controllers.Groups, 'store']).as('groups.store')
+    router
+      .post('/groups/:id/members', [controllers.Groups, 'addMembers'])
+      .as('groups.members.add')
+    router
+      .post('/groups/:id/members/:userId/remove', [controllers.Groups, 'removeMember'])
+      .as('groups.members.remove')
+    router.post('/groups/:id/leave', [controllers.Groups, 'leave']).as('groups.leave')
     router.get('/profile', [controllers.Profiles, 'edit']).as('profile.edit')
     router.post('/profile', [controllers.Profiles, 'update']).as('profile.update')
     router.post('/profile/password', [controllers.Profiles, 'updatePassword']).as('profile.password')
