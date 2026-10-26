@@ -7,6 +7,10 @@ import { dbAssertions } from '@adonisjs/lucid/plugins/db'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { authBrowserClient } from '@adonisjs/auth/plugins/browser_client'
 import { sessionBrowserClient } from '@adonisjs/session/plugins/browser_client'
+import { apiClient } from '@japa/api-client'
+import { shieldApiClient } from '@adonisjs/shield/plugins/api_client'
+import { authApiClient } from '@adonisjs/auth/plugins/api_client'
+import { sessionApiClient } from '@adonisjs/session/plugins/api_client'
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -23,6 +27,10 @@ export const plugins: Config['plugins'] = [
   browserClient({ runInSuites: ['browser'] }),
   sessionBrowserClient(app),
   authBrowserClient(app),
+  apiClient(),
+  sessionApiClient(app),
+  shieldApiClient(),
+  authApiClient(app),
 ]
 
 /**
@@ -33,7 +41,8 @@ export const plugins: Config['plugins'] = [
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  // La base de test (.env.test) est recréée à partir des migrations avant les tests
+  setup: [() => testUtils.db().migrate()],
   teardown: [],
 }
 

@@ -94,21 +94,6 @@ export class MessageAttachmentSchema extends BaseModel {
   declare storedName: string
 }
 
-export class MessageReadSchema extends BaseModel {
-  static $columns = ['deliveredAt', 'id', 'messageId', 'readAt', 'userId'] as const
-  $columns = MessageReadSchema.$columns
-  @column.dateTime()
-  declare deliveredAt: DateTime | null
-  @column({ isPrimary: true })
-  declare id: number
-  @column()
-  declare messageId: number
-  @column.dateTime()
-  declare readAt: DateTime | null
-  @column()
-  declare userId: number
-}
-
 export class MessageSchema extends BaseModel {
   static $columns = ['content', 'conversationId', 'createdAt', 'deletedAt', 'id', 'senderId', 'updatedAt'] as const
   $columns = MessageSchema.$columns

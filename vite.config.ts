@@ -17,6 +17,9 @@ export default defineConfig({
     }),
   ],
 
+  // Les tests ont leur propre cache : ils ne perturbent pas le serveur de développement
+  cacheDir: process.env.NODE_ENV === 'test' ? 'node_modules/.vite-test' : undefined,
+
   server: {
     watch: {
       ignored: ['**/storage/**', '**/tmp/**'],
