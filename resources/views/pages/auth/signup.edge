@@ -24,20 +24,56 @@
     @end
     @field.root({ name: 'password' })
       @!field.label({ text: 'Mot de passe' })
-      @!input.control({
-        type: 'password',
-        autocomplete: 'new-password',
-        placeholder: '••••••••',
-      })
+      <div class="pwfield" x-data="{ show: false }">
+        @!input.control({
+          type: 'password',
+          autocomplete: 'new-password',
+          placeholder: '••••••••',
+          'x-bind:type': "show ? 'text' : 'password'",
+        })
+        <button
+          type="button"
+          class="pwfield__toggle"
+          x-on:click="show = !show"
+          x-bind:aria-label="show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          x-bind:aria-pressed="show"
+          aria-label="Afficher le mot de passe"
+        >
+          <span x-show="!show">
+            @svg('lucide:eye', { width: 17, height: 17 })
+          </span>
+          <span x-show="show" x-cloak>
+            @svg('lucide:eye-off', { width: 17, height: 17 })
+          </span>
+        </button>
+      </div>
       @!field.error()
     @end
     @field.root({ name: 'passwordConfirmation' })
       @!field.label({ text: 'Confirmer le mot de passe' })
-      @!input.control({
-        type: 'password',
-        autocomplete: 'new-password',
-        placeholder: '••••••••',
-      })
+      <div class="pwfield" x-data="{ show: false }">
+        @!input.control({
+          type: 'password',
+          autocomplete: 'new-password',
+          placeholder: '••••••••',
+          'x-bind:type': "show ? 'text' : 'password'",
+        })
+        <button
+          type="button"
+          class="pwfield__toggle"
+          x-on:click="show = !show"
+          x-bind:aria-label="show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          x-bind:aria-pressed="show"
+          aria-label="Afficher le mot de passe"
+        >
+          <span x-show="!show">
+            @svg('lucide:eye', { width: 17, height: 17 })
+          </span>
+          <span x-show="show" x-cloak>
+            @svg('lucide:eye-off', { width: 17, height: 17 })
+          </span>
+        </button>
+      </div>
       @!field.error()
     @end
     @!button({

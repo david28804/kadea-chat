@@ -28,11 +28,15 @@ export default class EmailTokenService {
    * (c'est lui qui part dans l'e-mail).
    */
   static async create(user: User, type: 'confirmation' | 'reset', minutes: number) {
-    await EmailToken.query()
-      .where('userId', user.id)
-      .where('type', type)
-      .whereNull('usedAt')
-      .delete()
+    // Un nouveau lien de réinitialisation remplace l'ancien. Les liens de confirmation,
+    // eux, restent tous valides : la personne peut cliquer sur n'importe quel e-mail reçu.
+    if (type === 'reset') {
+      await EmailToken.query()
+        .where('userId', user.id)
+        .where('type', type)
+        .whereNull('usedAt')
+        .delete()
+    }
 
     const token = randomBytes(32).toString('hex')
     await EmailToken.create({

@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import mail from '@adonisjs/mail/services/main'
 import User from '#models/user'
+import EmailTokenService from '#services/email_token_service'
 import { createUser, PASSWORD } from '#tests/helpers'
 
 test.group('Authentification', (group) => {
@@ -46,6 +47,43 @@ test.group('Authentification', (group) => {
     response.assertStatus(302)
     response.assertHeader('location', '/login')
     response.assertFlashMessage('error')
+  })
+
+  test("un compte non confirmé reçoit un nouveau lien en se connectant, sans en recevoir en rafale", async ({
+    client,
+  }) => {
+    const { messages } = mail.fake()
+    const user = await createUser()
+    user.emailVerifiedAt = null
+    await user.save()
+
+    for (let i = 0; i < 2; i++) {
+      await client
+        .post('/login')
+        .form({ email: user.email, password: PASSWORD })
+        .withCsrfToken()
+        .redirects(0)
+    }
+
+    messages.assertSentCount(1)
+    messages.assertSent({ to: user.email })
+    mail.restore()
+  })
+
+  test("le lien d'un ancien e-mail de confirmation reste valable", async ({ client, assert }) => {
+    const user = await createUser()
+    user.emailVerifiedAt = null
+    await user.save()
+
+    const firstLink = await EmailTokenService.create(user, 'confirmation', 60)
+    await EmailTokenService.create(user, 'confirmation', 60)
+
+    const response = await client.get(`/email/confirm/${firstLink}`).redirects(0)
+
+    response.assertHeader('location', '/login')
+    response.assertFlashMessage('success')
+    await user.refresh()
+    assert.isNotNull(user.emailVerifiedAt)
   })
 
   test('un compte confirmé se connecte et arrive sur ses conversations', async ({ client }) => {

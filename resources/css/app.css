@@ -2940,3 +2940,37 @@ body.kc .searchbar {
   padding: 4px 12px;
   border-radius: 999px;
 }
+
+/* Champ mot de passe avec bouton « afficher / masquer » */
+.pwfield {
+  position: relative;
+}
+.pwfield .field__input {
+  width: 100%;
+  padding-right: 42px;
+}
+.pwfield__toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: calc(var(--r) - 2px);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.pwfield__toggle:hover {
+  color: var(--ink);
+}
+.pwfield__toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.pwfield__toggle span {
+  display: grid;
+}

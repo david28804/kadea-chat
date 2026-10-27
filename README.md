@@ -65,14 +65,14 @@
 | Base de données | PostgreSQL + Lucid ORM |
 | Validation | VineJS |
 | Temps réel | Transmit (SSE) |
-| E-mails | Mailtrap (développement) |
+| E-mails | Brevo (API), ou Mailtrap en SMTP pour le développement |
 | Tests | Japa (tests fonctionnels avec client HTTP) |
 | Assets | Vite |
 | Polices | Inter Tight et Instrument Serif (Google Fonts) |
 
 ## Installation en local
 
-**Prérequis** : Node.js 24+, PostgreSQL, Git, un compte Mailtrap (gratuit).
+**Prérequis** : Node.js 24+, PostgreSQL, Git, un compte Brevo ou Mailtrap (gratuits).
 
 ```bash
 git clone https://github.com/david28804/kadea-chat.git
@@ -129,8 +129,10 @@ Les tests peuvent tourner pendant que `npm run dev` est lancé : ils ont leur pr
 | `APP_URL` | URL publique, utilisée dans les liens des e-mails |
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE` | Connexion PostgreSQL |
 | `SESSION_DRIVER` | Stockage des sessions |
-| `MAIL_FROM_NAME`, `MAIL_FROM_ADDRESS` | Expéditeur des e-mails |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Serveur d'envoi d'e-mails |
+| `MAIL_MAILER` | `brevo` (API Brevo) ou `smtp` (Mailtrap ou autre serveur SMTP) |
+| `MAIL_FROM_NAME`, `MAIL_FROM_ADDRESS` | Expéditeur des e-mails (avec Brevo, l'adresse doit être validée dans le compte Brevo) |
+| `BREVO_API_KEY` | Clé API Brevo, utilisée quand `MAIL_MAILER=brevo` |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Serveur SMTP, utilisé quand `MAIL_MAILER=smtp` |
 
 Le fichier `.env` n'est jamais versionné ; `.env.example` sert de modèle.
 
@@ -253,7 +255,7 @@ storage/uploads/ pièces jointes (contenu non versionné)
 
 _À compléter après la mise en ligne._ Points d'attention :
 
-- Remplacer Mailtrap par un vrai service SMTP (Resend, Brevo…)
+- Mettre `MAIL_MAILER=brevo` et `BREVO_API_KEY` dans les variables du serveur
 - Définir `APP_URL` sur l'adresse publique et générer une nouvelle `APP_KEY`
 - Utiliser une base PostgreSQL hébergée, puis `node ace migration:run`
 - Prévoir un stockage persistant pour `public/uploads/` et `storage/uploads/`

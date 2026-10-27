@@ -23,6 +23,12 @@ const mailConfig = defineConfig({
         pass: env.get('SMTP_PASSWORD') as string,
       },
     }),
+
+    // Envoi par l'API de Brevo (production)
+    brevo: transports.brevo({
+      key: env.get('BREVO_API_KEY') as string,
+      baseUrl: 'https://api.brevo.com/v3',
+    }),
   },
 })
 

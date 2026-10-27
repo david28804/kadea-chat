@@ -11,6 +11,12 @@ export default class EmailConfirmationsController {
       .preload('user')
       .first()
 
+    // Lien déjà utilisé (ou un autre lien a déjà servi) : l'adresse est confirmée
+    if (emailToken?.user.emailVerifiedAt) {
+      session.flash('success', 'Votre adresse e-mail est déjà confirmée, vous pouvez vous connecter.')
+      return response.redirect().toRoute('session.create')
+    }
+
     if (!emailToken || emailToken.isUsed || emailToken.isExpired) {
       session.flash('error', 'Ce lien de confirmation est invalide ou a expiré.')
       return response.redirect().toRoute('session.create')

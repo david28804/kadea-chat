@@ -1,4 +1,7 @@
+import { DateTime } from 'luxon'
 import User from '#models/user'
+import EmailToken from '#models/email_token'
+import EmailTokenService from '#services/email_token_service'
 import { loginValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -18,13 +21,31 @@ export default class SessionController {
   /**
    * Authenticate user credentials and create a new session
    */
-  async store({ request, auth, response, session }: HttpContext) {
+  async store({ request, auth, response, session, logger }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
     const user = await User.verifyCredentials(email, password)
 
-    // Refuse la connexion tant que l'e-mail n'est pas confirmé
+    // Refuse la connexion tant que l'e-mail n'est pas confirmé,
+    // et renvoie un lien de confirmation (au plus un toutes les 2 minutes)
     if (!user.emailVerifiedAt) {
-      session.flash('error', "Confirmez d'abord votre adresse e-mail (vérifiez votre boîte de réception).")
+      const recent = await EmailToken.query()
+        .where('userId', user.id)
+        .where('type', 'confirmation')
+        .where('createdAt', '>', DateTime.now().minus({ minutes: 2 }).toSQL()!)
+        .first()
+
+      if (!recent) {
+        try {
+          await EmailTokenService.sendConfirmation(user)
+        } catch (error) {
+          logger.error({ err: error }, 'Échec renvoi e-mail de confirmation')
+        }
+      }
+
+      session.flash(
+        'error',
+        "Confirmez d'abord votre adresse e-mail : nous venons de vous renvoyer le lien (pensez à regarder dans les spams)."
+      )
       return response.redirect().toRoute('session.create')
     }
 
