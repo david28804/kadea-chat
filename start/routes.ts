@@ -51,6 +51,7 @@ router
     router.post('/conversations/:id/read', [controllers.Messages, 'read']).as('messages.read')
     router.get('/attachments/:id', [controllers.Messages, 'attachment']).as('attachments.show')
     router.post('/messages/:id/delete', [controllers.Messages, 'destroy']).as('messages.destroy')
+    router.post('/messages/:id/update', [controllers.Messages, 'update']).as('messages.update')
     router.post('/users/:id/block', [controllers.Blocks, 'store']).as('users.block')
     router.post('/users/:id/unblock', [controllers.Blocks, 'destroy']).as('users.unblock')
     router.post('/presence/ping', [controllers.Presences, 'ping']).as('presence.ping')

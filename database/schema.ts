@@ -95,7 +95,7 @@ export class MessageAttachmentSchema extends BaseModel {
 }
 
 export class MessageSchema extends BaseModel {
-  static $columns = ['content', 'conversationId', 'createdAt', 'deletedAt', 'id', 'senderId', 'updatedAt'] as const
+  static $columns = ['content', 'conversationId', 'createdAt', 'deletedAt', 'editedAt', 'id', 'senderId', 'updatedAt'] as const
   $columns = MessageSchema.$columns
   @column()
   declare content: string | null
@@ -105,6 +105,8 @@ export class MessageSchema extends BaseModel {
   declare createdAt: DateTime
   @column.dateTime()
   declare deletedAt: DateTime | null
+  @column.dateTime()
+  declare editedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
   @column()

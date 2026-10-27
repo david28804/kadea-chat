@@ -29,11 +29,30 @@ if (box && transmit && box.dataset.live === '1') {
   }
 
   subscription.onMessage((data) => {
+    // Un message a été modifié : nouveau texte et mention « modifié »
+    if (data.type === 'edited') {
+      const bubble = box.querySelector(`[data-message-id="${data.id}"]`)
+      const text = bubble?.querySelector('.msg__text')
+      if (text) {
+        text.textContent = data.content
+        delete text.dataset.original
+        const input = bubble.querySelector('.msg__editinput')
+        if (input) input.value = data.content
+        if (!bubble.querySelector('.msg__edited')) {
+          const edited = document.createElement('span')
+          edited.className = 'msg__edited'
+          edited.textContent = 'modifié'
+          bubble.querySelector('.msg__time')?.before(edited)
+        }
+      }
+      return
+    }
+
     // Un message a été supprimé : on remplace son contenu
     if (data.type === 'deleted') {
       const bubble = box.querySelector(`[data-message-id="${data.id}"]`)
       if (bubble) {
-        bubble.querySelectorAll('.msg__text, .msg__image, .msg__file, .msg__del, .msg__tick').forEach(
+        bubble.querySelectorAll('.msg__text, .msg__image, .msg__file, .msg__actions, .msg__editform, .msg__edited, .msg__tick').forEach(
           (element) => element.remove()
         )
 
@@ -223,5 +242,17 @@ if (box && searchInput) {
       searchInput.value = ''
       filterMessages('')
     }
+  })
+}
+
+// Téléphone (pas de survol) : toucher un message affiche ses actions (modifier, supprimer)
+if (box) {
+  box.addEventListener('click', (event) => {
+    if (event.target.closest('a, button, summary, form, textarea')) return
+    const bubble = event.target.closest('.msg')
+    box.querySelectorAll('.msg.is-active').forEach((other) => {
+      if (other !== bubble) other.classList.remove('is-active')
+    })
+    bubble?.classList.toggle('is-active')
   })
 }

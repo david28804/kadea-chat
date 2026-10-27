@@ -295,6 +295,7 @@ export default class ConversationsController {
         id: message.id,
         content: message.isDeleted ? null : message.content,
         isDeleted: message.isDeleted,
+        isEdited: !message.isDeleted && message.editedAt !== null,
         isMine: message.senderId === user.id,
         author: message.sender?.fullName ?? message.sender?.email ?? 'Utilisateur supprimé',
         time: message.createdAt.toFormat('HH:mm'),

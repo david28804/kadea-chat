@@ -1,12 +1,8 @@
-<p align="center">
-  <img src="public/logo/kadea-chat-logo-horizontal.svg" alt="Kadea Chat" width="320" />
-</p>
-
-<h1 align="center">Kadea Chat</h1>
+<h1 align="center">Kadea Chat*</h1>
 
 <p align="center">
   Application web de messagerie pour les étudiants de Kadea Academy.<br />
-  Conversations privées, groupes, temps réel, présence et gestion du profil.
+  Conversations privées, groupes, temps réel, recherche, présence et gestion du profil.
 </p>
 
 - **Auteur** : David Mbiya
@@ -19,32 +15,46 @@
 1. [Fonctionnalités](#fonctionnalités)
 2. [Technologies](#technologies)
 3. [Installation en local](#installation-en-local)
-4. [Variables d'environnement](#variables-denvironnement)
-5. [Schéma de base de données](#schéma-de-base-de-données)
-6. [Structure du projet](#structure-du-projet)
-7. [Sécurité](#sécurité)
-8. [Déploiement](#déploiement)
-9. [État d'avancement](#état-davancement)
+4. [Tests](#tests)
+5. [Variables d'environnement](#variables-denvironnement)
+6. [Schéma de base de données](#schéma-de-base-de-données)
+7. [Structure du projet](#structure-du-projet)
+8. [Sécurité](#sécurité)
+9. [Déploiement](#déploiement)
+10. [État d'avancement](#état-davancement)
 
 ## Fonctionnalités
 
-**Authentification**
+**Accueil et authentification**
+- Page d'accueil qui présente l'application, avec menu burger sur téléphone
 - Inscription, confirmation de l'adresse e-mail par lien, connexion, déconnexion
 - Mot de passe oublié et réinitialisation par e-mail
 - Pages protégées : seul un utilisateur connecté accède aux conversations
 
-**Messagerie**
+**Conversations**
 - Conversations privées (une seule par paire d'utilisateurs) et groupes
+- Fenêtre « Nouveau » : démarrer une conversation ou créer un groupe sans quitter la page
 - Messages en temps réel (Server-Sent Events via Transmit)
+- Statuts des messages : envoyé, reçu, lu
+- Partage de fichiers et d'images (5 Mo maximum)
 - Compteur de messages non lus, filtres Toutes / Non lues / Groupes
-- Suppression de ses propres messages
+- Modification et suppression de ses propres messages (actions au survol sur ordinateur, au toucher sur téléphone) ; un message modifié porte la mention « modifié »
 - Indicateur « en train d'écrire » et présence en ligne
 - Blocage / déblocage d'un utilisateur
 
-**Profil**
+**Groupes**
+- Le créateur du groupe en est l'administrateur
+- Un administrateur ajoute et retire des membres
+- Chacun peut quitter un groupe ; si le dernier administrateur part, le membre le plus ancien le devient ; le groupe disparaît quand le dernier membre part
+
+**Recherche**
+- Barre de recherche de la liste : trouve les conversations par leur nom et les messages qui contiennent le mot tapé, dans toutes ses conversations
+- Recherche dans une conversation : les messages se filtrent pendant la frappe, le mot est surligné ; Entrée cherche dans tout l'historique
+
+**Profil et apparence**
 - Modification du nom et du mot de passe
 - Photo de profil avec recadrage circulaire
-- Thème clair / sombre aux couleurs de Kadea (rouge, blanc, noir)
+- Thème crème et noir, en mode sombre (par défaut) ou clair, mémorisé pour tout le site
 
 ## Technologies
 
@@ -56,11 +66,13 @@
 | Validation | VineJS |
 | Temps réel | Transmit (SSE) |
 | E-mails | Mailtrap (développement) |
+| Tests | Japa (tests fonctionnels avec client HTTP) |
 | Assets | Vite |
+| Polices | Inter Tight et Instrument Serif (Google Fonts) |
 
 ## Installation en local
 
-**Prérequis** : Node.js 20+, PostgreSQL, Git, un compte Mailtrap (gratuit).
+**Prérequis** : Node.js 24+, PostgreSQL, Git, un compte Mailtrap (gratuit).
 
 ```bash
 git clone https://github.com/david28804/kadea-chat.git
@@ -76,14 +88,37 @@ node ace generate:key
 
 ```bash
 node ace migration:run
-mkdir -p public/uploads/avatars
 npm run dev
 ```
 
 L'application est disponible sur http://localhost:3333.
 
+Les dossiers des fichiers envoyés (`public/uploads/` pour les photos de profil,
+`storage/uploads/` pour les pièces jointes) existent déjà dans le dépôt ; leur contenu n'est jamais versionné.
+
 > **Tester le temps réel** : deux fenêtres du même navigateur partagent la session.
 > Utilisez deux navigateurs différents (ex. Opera et Edge) ou une fenêtre privée.
+
+## Tests
+
+Les tests utilisent une base séparée, `kadea_chat_test` (réglée dans `.env.test`), qui est
+recréée à partir des migrations à chaque lancement. Votre base de développement n'est jamais touchée.
+
+```bash
+# Une seule fois : créer la base de test
+psql -U postgres -c "CREATE DATABASE kadea_chat_test;"
+
+# Lancer les tests
+node ace test
+```
+
+| Fichier | Ce qui est vérifié |
+| --- | --- |
+| `tests/functional/auth.spec.ts` | Inscription et envoi de l'e-mail, connexion refusée sans e-mail confirmé, connexion, mauvais mot de passe, pages protégées, déconnexion |
+| `tests/functional/conversations.spec.ts` | Accès et écriture refusés aux non-membres, une seule conversation privée par paire, recherche de messages limitée à ses conversations, recherche dans une conversation, modification réservée à l'auteur |
+| `tests/functional/groups.spec.ts` | Création, ajout et retrait réservés aux administrateurs, passage du rôle d'administrateur, suppression du groupe vide |
+
+Les tests peuvent tourner pendant que `npm run dev` est lancé : ils ont leur propre cache Vite.
 
 ## Variables d'environnement
 
@@ -94,6 +129,7 @@ L'application est disponible sur http://localhost:3333.
 | `APP_URL` | URL publique, utilisée dans les liens des e-mails |
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE` | Connexion PostgreSQL |
 | `SESSION_DRIVER` | Stockage des sessions |
+| `MAIL_FROM_NAME`, `MAIL_FROM_ADDRESS` | Expéditeur des e-mails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Serveur d'envoi d'e-mails |
 
 Le fichier `.env` n'est jamais versionné ; `.env.example` sert de modèle.
@@ -105,12 +141,10 @@ erDiagram
     users ||--o{ email_tokens : possede
     users ||--o{ conversation_members : participe
     users ||--o{ messages : envoie
-    users ||--o{ message_reads : lit
     users ||--o{ blocked_users : bloque
     conversations ||--o{ conversation_members : contient
     conversations ||--o{ messages : contient
     messages ||--o{ message_attachments : joint
-    messages ||--o{ message_reads : suivi
 
     users {
         int id PK
@@ -149,6 +183,7 @@ erDiagram
         int sender_id FK
         text content
         timestamptz deleted_at
+        timestamptz edited_at
     }
     message_attachments {
         int id PK
@@ -157,13 +192,6 @@ erDiagram
         string stored_name
         string mime_type
         int size
-    }
-    message_reads {
-        int id PK
-        int message_id FK
-        int user_id FK
-        timestamptz delivered_at
-        timestamptz read_at
     }
     blocked_users {
         int id PK
@@ -177,11 +205,12 @@ erDiagram
 | `users` | Comptes ; `email_verified_at` vide tant que l'e-mail n'est pas confirmé |
 | `email_tokens` | Jetons de confirmation (24 h) et de réinitialisation (1 h), stockés hachés (SHA-256), à usage unique |
 | `conversations` | Privées ou groupes ; `direct_key` (`min-max` des ids) évite les doublons en privé |
-| `conversation_members` | Membres d'une conversation ; `last_read_at` sert au compteur de non lus |
-| `messages` | Messages ; suppression logique via `deleted_at` |
-| `message_attachments` | Fichiers joints (table prête, fonctionnalité à venir) |
-| `message_reads` | Statuts reçu / lu (table prête, fonctionnalité à venir) |
+| `conversation_members` | Membres d'une conversation ; `role` (`admin` / `member`) pour les groupes ; `last_read_at` sert au compteur de non lus et aux statuts reçu / lu |
+| `messages` | Messages ; suppression logique via `deleted_at`, date de modification dans `edited_at` |
+| `message_attachments` | Fichiers joints (images et documents, 5 Mo maximum) |
 | `blocked_users` | Relations de blocage |
+
+Une table `message_reads` a existé au début du projet ; elle n'a jamais servi et une migration la supprime.
 
 ## Structure du projet
 
@@ -190,19 +219,22 @@ app/
   controllers/   session, comptes, e-mails, conversations, messages, groupes, blocages, profil, présence
   models/        modèles Lucid et relations
   services/      email_token_service, presence_service
-  validators/     règles de validation VineJS
+  validators/    règles de validation VineJS
 database/
-  migrations/    8 tables
+  migrations/    tables de l'application
+  schema.ts      classes de schéma générées par Lucid
 resources/
-  css/app.css    thème Kadea (clair / sombre)
-  js/            realtime, chat, présence, recadrage d'avatar
+  css/app.css    thème Kadea (crème et noir, sombre / clair)
+  js/            realtime, chat (messages, recherche), présence, recadrage d'avatar, accueil
   views/         layouts, composants et pages Edge
 start/
   routes.ts      routes et middlewares
   transmit.ts    autorisations des canaux temps réel
-public/
-  logo/          logos SVG
-  uploads/       avatars (non versionné)
+tests/
+  functional/    tests de l'authentification, des conversations et des groupes
+  helpers.ts     création de comptes, conversations et messages pour les tests
+public/uploads/  photos de profil (contenu non versionné)
+storage/uploads/ pièces jointes (contenu non versionné)
 ```
 
 ## Sécurité
@@ -210,9 +242,12 @@ public/
 - Mots de passe hachés, sessions par cookie, protection CSRF (Shield)
 - Jetons d'e-mail hachés, expirants et à usage unique
 - Accès aux conversations réservé à leurs membres ; canaux temps réel autorisés côté serveur
+- Gestion des groupes réservée aux administrateurs, vérifiée côté serveur
+- La recherche de messages ne porte que sur les conversations de la personne connectée
 - Envoi de fichiers validé (taille, extension, signature réelle du fichier)
-- Requêtes SQL paramétrées (Lucid) et échappement automatique d'Edge contre le XSS
-- Secrets uniquement dans `.env`, exclu de Git
+- Requêtes SQL paramétrées (Lucid) et échappement automatique d'Edge contre le XSS ;
+  le surlignage des recherches construit le texte sans `innerHTML`
+- Secrets uniquement dans `.env`, exclu de Git ; fichiers des utilisateurs exclus de Git
 
 ## Déploiement
 
@@ -221,21 +256,23 @@ _À compléter après la mise en ligne._ Points d'attention :
 - Remplacer Mailtrap par un vrai service SMTP (Resend, Brevo…)
 - Définir `APP_URL` sur l'adresse publique et générer une nouvelle `APP_KEY`
 - Utiliser une base PostgreSQL hébergée, puis `node ace migration:run`
-- Prévoir un stockage persistant pour `public/uploads/`
+- Prévoir un stockage persistant pour `public/uploads/` et `storage/uploads/`
 - La présence en ligne est gardée en mémoire : une seule instance du serveur
 
 ## État d'avancement
 
 | Élément | État |
 | --- | --- |
+| Page d'accueil | Terminé |
 | Inscription, confirmation e-mail, connexion, réinitialisation | Terminé |
 | Conversations privées et groupes | Terminé |
-| Messages en temps réel, non lus, suppression | Terminé |
+| Messages en temps réel, non lus, modification, suppression | Terminé |
+| Statuts envoyé / reçu / lu | Terminé |
+| Partage de fichiers et d'images | Terminé |
 | Présence en ligne et indicateur de saisie | Terminé |
 | Blocage d'utilisateurs | Terminé |
-| Profil, photo recadrée, thème Kadea | Terminé |
-| Statuts envoyé / reçu / lu | À faire |
-| Partage de fichiers et d'images | À faire |
 | Gestion de groupe (ajout, retrait, quitter) | Terminé |
-| Recherche dans une conversation (interface) | Terminé |
+| Recherche (liste et conversation) | Terminé |
+| Profil, photo recadrée, thème sombre / clair | Terminé |
+| Tests automatiques | Terminé |
 | Déploiement | À faire |

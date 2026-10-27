@@ -835,11 +835,6 @@ label.person {
 .msg__yes:hover {
   text-decoration: underline;
 }
-@media (hover: none) {
-  .msg__del summary {
-    opacity: 1;
-  }
-}
 
 /* ==========================================================================
    Blocage d'un utilisateur
@@ -2855,4 +2850,93 @@ body.kc .searchbar {
 :root[data-theme='light'] .msgresult__hit {
   background: #1c1b17;
   color: #e5e3d3;
+}
+
+/* ==========================================================================
+   Actions sur mes messages : modifier, supprimer
+   Visibles au survol (ordinateur) ou quand on touche le message (téléphone)
+   ========================================================================== */
+.msg__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.msg:hover .msg__actions,
+.msg.is-active .msg__actions,
+.msg:focus-within .msg__actions,
+.msg__actions:has(.msg__del[open]) {
+  opacity: 1;
+}
+/* Sur écran tactile, des actions invisibles ne doivent pas pouvoir être touchées par erreur */
+@media (hover: none) {
+  .msg:not(.is-active) .msg__actions:not(:has(.msg__del[open])) {
+    pointer-events: none;
+  }
+}
+.msg__actions .msg__del summary {
+  opacity: 1;
+}
+.msg__action {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.msg__action:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+
+/* Mention « modifié » à côté de l'heure */
+.msg__edited {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* Modification du texte, dans la bulle */
+.msg.is-editing {
+  width: min(420px, 78%);
+}
+.msg__editform {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.msg__editinput {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--field);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+.msg__editinput:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+.msg__editactions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: 12.5px;
+}
+.msg__editcancel {
+  color: var(--muted);
+}
+.msg__editcancel:hover {
+  color: var(--ink);
+}
+.msg__editactions .msg__yes {
+  padding: 4px 12px;
+  border-radius: 999px;
 }

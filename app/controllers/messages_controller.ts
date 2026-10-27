@@ -31,6 +31,13 @@ const messageValidator = vine.compile(
   })
 )
 
+// Modification d'un message : le texte ne peut pas devenir vide
+const editValidator = vine.compile(
+  vine.object({
+    content: vine.string().trim().minLength(1).maxLength(2000),
+  })
+)
+
 export default class MessagesController {
   /**
    * Enregistre un nouveau message (texte et/ou fichier) dans une conversation
@@ -278,6 +285,45 @@ export default class MessagesController {
       transmit.broadcast(`conversations/${message.conversationId}`, {
         type: 'deleted',
         id: message.id,
+      })
+    }
+
+    return response.redirect().toRoute('conversations.show', { id: message.conversationId })
+  }
+
+  /**
+   * Modifie le texte d'un message : seul son auteur peut le faire, tant qu'il n'est pas supprimé
+   */
+  async update({ auth, params, request, response, session }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const id = Number(params.id)
+
+    if (!Number.isInteger(id)) {
+      return response.notFound('Message introuvable')
+    }
+
+    const message = await Message.find(id)
+    if (!message) {
+      return response.notFound('Message introuvable')
+    }
+
+    if (message.senderId !== user.id) {
+      return response.forbidden('Vous ne pouvez modifier que vos propres messages')
+    }
+
+    const { content } = await request.validateUsing(editValidator)
+
+    if (message.isDeleted || message.content === null) {
+      session.flash('error', 'Ce message ne peut pas être modifié.')
+    } else if (content !== message.content) {
+      message.content = content
+      message.editedAt = DateTime.now()
+      await message.save()
+
+      transmit.broadcast(`conversations/${message.conversationId}`, {
+        type: 'edited',
+        id: message.id,
+        content,
       })
     }
 

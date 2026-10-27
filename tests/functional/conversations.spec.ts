@@ -93,4 +93,59 @@ test.group('Conversations', (group) => {
     response.assertTextIncludes('1 résultat pour « demain »')
     response.assertTextIncludes('Rendez-vous demain')
   })
+
+  test("l'auteur peut modifier son message", async ({ client, assert }) => {
+    const [a, b] = [await createUser(), await createUser()]
+    const conversation = await createPrivate(a, b)
+    const message = await postMessage(conversation, a, 'Rendez-vous à 10h')
+
+    await client
+      .post(`/messages/${message.id}/update`)
+      .form({ content: 'Rendez-vous à 11h' })
+      .loginAs(a)
+      .withCsrfToken()
+      .redirects(0)
+
+    await message.refresh()
+    assert.equal(message.content, 'Rendez-vous à 11h')
+    assert.isNotNull(message.editedAt)
+
+    const page = await client.get(`/conversations/${conversation.id}`).loginAs(b)
+    page.assertTextIncludes('modifié')
+  })
+
+  test("personne d'autre ne peut modifier le message", async ({ client, assert }) => {
+    const [a, b] = [await createUser(), await createUser()]
+    const conversation = await createPrivate(a, b)
+    const message = await postMessage(conversation, a, 'Texte original')
+
+    const response = await client
+      .post(`/messages/${message.id}/update`)
+      .form({ content: 'Texte piraté' })
+      .loginAs(b)
+      .withCsrfToken()
+      .redirects(0)
+
+    response.assertStatus(403)
+    await message.refresh()
+    assert.equal(message.content, 'Texte original')
+  })
+
+  test('un message ne peut pas être vidé en le modifiant', async ({ client, assert }) => {
+    const [a, b] = [await createUser(), await createUser()]
+    const conversation = await createPrivate(a, b)
+    const message = await postMessage(conversation, a, 'Texte original')
+
+    await client
+      .post(`/messages/${message.id}/update`)
+      .form({ content: '   ' })
+      .header('referer', `/conversations/${conversation.id}`)
+      .loginAs(a)
+      .withCsrfToken()
+      .redirects(0)
+
+    await message.refresh()
+    assert.equal(message.content, 'Texte original')
+    assert.isNull(message.editedAt)
+  })
 })

@@ -386,7 +386,12 @@
               @if(message.showDay)
                 <div class="msgs__day">{{ message.day }}</div>
               @end
-              <div class="msg {{ message.isMine ? 'msg--mine' : '' }}" data-message-id="{{ message.id }}">
+              <div
+                class="msg {{ message.isMine ? 'msg--mine' : '' }}"
+                data-message-id="{{ message.id }}"
+                x-data="{ editing: false }"
+                x-bind:class="editing && 'is-editing'"
+              >
                 @if(active.isGroup && !message.isMine)
                   <span class="msg__author">{{ message.author }}</span>
                 @end
@@ -407,24 +412,68 @@
                     @end
                   @end
                   @if(message.content)
-                    <span class="msg__text">{{ message.content }}</span>
+                    <span class="msg__text" x-show="!editing">{{ message.content }}</span>
+                    @if(message.isMine)
+                      {{-- Modification du texte : Entrée enregistre, Maj+Entrée va à la ligne, Échap annule --}}
+                      @form({
+                        route: 'messages.update',
+                        routeParams: { id: message.id },
+                        method: 'POST',
+                        class: 'msg__editform',
+                        'x-show': 'editing',
+                        'x-cloak': true,
+                      })
+                        <textarea
+                          name="content"
+                          class="msg__editinput"
+                          rows="2"
+                          maxlength="2000"
+                          required
+                          aria-label="Modifier le message"
+                          x-ref="edit"
+                          x-on:keydown.escape.prevent="editing = false"
+                          x-on:keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); $el.form.requestSubmit() }"
+                        >{{ message.content }}</textarea>
+                        <div class="msg__editactions">
+                          <button type="button" class="msg__editcancel" x-on:click="editing = false">Annuler</button>
+                          <button type="submit" class="msg__yes">Enregistrer</button>
+                        </div>
+                      @end
+                    @end
                   @end
                 @end
                 <div class="msg__foot">
                   @if(message.isMine && !message.isDeleted)
-                    <details class="msg__del">
-                      <summary aria-label="Supprimer le message" title="Supprimer">
-                        @svg('lucide:trash-2', { width: 13, height: 13 })
-                      </summary>
-                      @form({
-                        route: 'messages.destroy',
-                        routeParams: { id: message.id },
-                        method: 'POST',
-                      })
-                        <span>Supprimer ?</span>
-                        <button type="submit" class="msg__yes">Oui</button>
+                    {{-- Actions : visibles au survol (ordinateur) ou quand on touche le message (téléphone) --}}
+                    <span class="msg__actions" x-show="!editing">
+                      @if(message.content)
+                        <button
+                          type="button"
+                          class="msg__action"
+                          aria-label="Modifier le message"
+                          title="Modifier"
+                          x-on:click="editing = true; $nextTick(() => { $refs.edit.focus(); $refs.edit.setSelectionRange($refs.edit.value.length, $refs.edit.value.length) })"
+                        >
+                          @svg('lucide:pencil', { width: 13, height: 13 })
+                        </button>
                       @end
-                    </details>
+                      <details class="msg__del">
+                        <summary aria-label="Supprimer le message" title="Supprimer">
+                          @svg('lucide:trash-2', { width: 13, height: 13 })
+                        </summary>
+                        @form({
+                          route: 'messages.destroy',
+                          routeParams: { id: message.id },
+                          method: 'POST',
+                        })
+                          <span>Supprimer ?</span>
+                          <button type="submit" class="msg__yes">Oui</button>
+                        @end
+                      </details>
+                    </span>
+                  @end
+                  @if(message.isEdited)
+                    <span class="msg__edited">modifié</span>
                   @end
                   <span class="msg__time">{{ message.time }}</span>
                   @if(message.isMine && !message.isDeleted)

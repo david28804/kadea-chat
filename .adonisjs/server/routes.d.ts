@@ -26,6 +26,7 @@ export type ScannedRoutes = {
     'messages.read': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
@@ -80,6 +81,7 @@ export type ScannedRoutes = {
     'messages.typing': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.read': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.block': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'users.unblock': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
