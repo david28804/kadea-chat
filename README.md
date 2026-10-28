@@ -253,13 +253,24 @@ storage/uploads/ pièces jointes (contenu non versionné)
 
 ## Déploiement
 
-_À compléter après la mise en ligne._ Points d'attention :
+L'application est déployée sur [Render](https://render.com) grâce au fichier `render.yaml`
+(Blueprint), qui crée le service web et la base PostgreSQL.
 
-- Mettre `MAIL_MAILER=brevo` et `BREVO_API_KEY` dans les variables du serveur
-- Définir `APP_URL` sur l'adresse publique et générer une nouvelle `APP_KEY`
-- Utiliser une base PostgreSQL hébergée, puis `node ace migration:run`
-- Prévoir un stockage persistant pour `public/uploads/` et `storage/uploads/`
-- La présence en ligne est gardée en mémoire : une seule instance du serveur
+1. Sur Render : **New → Blueprint**, puis choisir le dépôt `kadea-chat`.
+2. Renseigner les deux valeurs demandées :
+   - `MAIL_FROM_ADDRESS` : adresse d'expédition validée dans Brevo ;
+   - `BREVO_API_KEY` : clé API Brevo.
+3. Lancer le déploiement. À chaque démarrage, les migrations sont appliquées automatiquement.
+
+`APP_KEY` est générée par Render, et `APP_URL` prend l'adresse publique du service
+(`https://….onrender.com`), utilisée dans les liens des e-mails.
+
+Limites de l'offre gratuite :
+
+- Le serveur s'endort après 15 minutes sans visite ; la première visite suivante prend environ une minute.
+- Les fichiers envoyés (`public/uploads/`, `storage/uploads/`) ne sont pas conservés lors d'un redéploiement ou d'un redémarrage : il faudrait un disque persistant (offre payante) ou un stockage externe.
+- La base PostgreSQL gratuite expire au bout de 30 jours.
+- La présence en ligne est gardée en mémoire : une seule instance du serveur.
 
 ## État d'avancement
 
@@ -277,4 +288,4 @@ _À compléter après la mise en ligne._ Points d'attention :
 | Recherche (liste et conversation) | Terminé |
 | Profil, photo recadrée, thème sombre / clair | Terminé |
 | Tests automatiques | Terminé |
-| Déploiement | À faire |
+| Déploiement (Render) | Configuré |

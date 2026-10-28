@@ -1,0 +1,60 @@
+# Déploiement sur Render (Blueprint) : l'application et sa base PostgreSQL
+services:
+  - type: web
+    name: kadea-chat
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --include=dev && node ace build && cd build && npm ci --omit=dev
+    # APP_URL prend l'adresse publique donnée par Render si elle n'est pas définie
+    startCommand: export APP_URL="${APP_URL:-$RENDER_EXTERNAL_URL}" && cd build && node ace migration:run --force && node bin/server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: TZ
+        value: UTC
+      - key: LOG_LEVEL
+        value: info
+      - key: APP_KEY
+        generateValue: true
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: DB_HOST
+        fromDatabase:
+          name: kadea-chat-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: kadea-chat-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: kadea-chat-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: kadea-chat-db
+          property: password
+      - key: DB_DATABASE
+        fromDatabase:
+          name: kadea-chat-db
+          property: database
+      - key: MAIL_MAILER
+        value: brevo
+      - key: MAIL_FROM_NAME
+        value: Kadea Chat
+      # Demandées à la création du Blueprint (jamais écrites dans le dépôt)
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+
+databases:
+  - name: kadea-chat-db
+    plan: free
+    region: frankfurt
+    databaseName: kadea_chat
+    user: kadea
