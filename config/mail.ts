@@ -15,8 +15,8 @@ const mailConfig = defineConfig({
 
   mailers: {
     smtp: transports.smtp({
-      host: env.get('SMTP_HOST'),
-      port: env.get('SMTP_PORT'),
+      host: env.get('SMTP_HOST') as string,
+      port: env.get('SMTP_PORT') as number,
       auth: {
         type: 'login',
         user: env.get('SMTP_USERNAME') as string,
