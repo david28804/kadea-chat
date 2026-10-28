@@ -7,7 +7,7 @@
 
 - **Auteur** : David Mbiya
 - **Dépôt** : https://github.com/david28804/kadea-chat
-- **Application en ligne** : _à compléter après le déploiement_
+- **Application en ligne** : https://kadea-chat-z4nf.onrender.com
 - **Maquette** : https://claude.ai/artifact/6cmtmK7UXpceCwtgAMsC45
 
 ## Sommaire
@@ -253,8 +253,8 @@ storage/uploads/ pièces jointes (contenu non versionné)
 
 ## Déploiement
 
-L'application est déployée sur [Render](https://render.com) grâce au fichier `render.yaml`
-(Blueprint), qui crée le service web et la base PostgreSQL.
+L'application est déployée sur [Render](https://render.com) à l'adresse https://kadea-chat-z4nf.onrender.com,
+grâce au fichier `render.yaml` (Blueprint), qui crée le service web et la base PostgreSQL.
 
 1. Sur Render : **New → Blueprint**, puis choisir le dépôt `kadea-chat`.
 2. Renseigner les deux valeurs demandées :
