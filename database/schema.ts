@@ -115,6 +115,19 @@ export class MessageSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class UserAvatarSchema extends BaseModel {
+  static $columns = ['data', 'mimeType', 'updatedAt', 'userId'] as const
+  $columns = UserAvatarSchema.$columns
+  @column()
+  declare data: Buffer
+  @column()
+  declare mimeType: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column({ isPrimary: true })
+  declare userId: number
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['avatar', 'createdAt', 'email', 'emailVerifiedAt', 'fullName', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns

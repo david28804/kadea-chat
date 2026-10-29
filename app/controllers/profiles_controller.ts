@@ -1,9 +1,7 @@
 import User from '#models/user'
 import vine from '@vinejs/vine'
-import app from '@adonisjs/core/services/app'
-import string from '@adonisjs/core/helpers/string'
+import db from '@adonisjs/lucid/services/db'
 import fs from 'node:fs/promises'
-import path from 'node:path'
 import type { HttpContext } from '@adonisjs/core/http'
 
 const profileValidator = vine.compile(
@@ -29,15 +27,11 @@ const avatarValidator = vine.compile(
   })
 )
 
-const AVATAR_DIR = 'public/uploads/avatars'
-
-/**
- * Efface l'ancienne photo du disque (seulement dans notre dossier d'avatars)
- */
-async function removeAvatarFile(avatar: string | null) {
-  if (!avatar) return
-  const fileName = path.basename(avatar)
-  await fs.rm(app.makePath(AVATAR_DIR, fileName), { force: true })
+const MIME_TYPES: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
 }
 
 export default class ProfilesController {
@@ -86,21 +80,29 @@ export default class ProfilesController {
   }
 
   /**
-   * Enregistre la photo de profil
+   * Enregistre la photo de profil dans la base de données
+   * (le disque de l'hébergeur est effacé à chaque redémarrage)
    */
   async updateAvatar({ auth, request, response, session }: HttpContext) {
     const me = auth.getUserOrFail()
     const { avatar } = await request.validateUsing(avatarValidator)
 
-    // Nom aléatoire : on n'utilise jamais le nom envoyé par l'ordinateur
-    const fileName = `${string.uuid()}.${avatar.extname}`
+    const data = await fs.readFile(avatar.tmpPath!)
+    const now = new Date()
 
-    await fs.mkdir(app.makePath(AVATAR_DIR), { recursive: true })
-    await avatar.move(app.makePath(AVATAR_DIR), { name: fileName })
+    await db
+      .table('user_avatars')
+      .insert({
+        user_id: me.id,
+        data,
+        mime_type: MIME_TYPES[avatar.extname!.toLowerCase()],
+        updated_at: now,
+      })
+      .onConflict('user_id')
+      .merge()
 
-    // On supprime l'ancienne photo, puis on retient la nouvelle
-    await removeAvatarFile(me.avatar)
-    me.avatar = `uploads/avatars/${fileName}`
+    // Le numéro de version force le navigateur à recharger la nouvelle photo
+    me.avatar = `avatars/${me.id}?v=${now.getTime()}`
     await me.save()
 
     session.flash('success', 'Votre photo de profil a été mise à jour.')
@@ -113,11 +115,28 @@ export default class ProfilesController {
   async destroyAvatar({ auth, response, session }: HttpContext) {
     const me = auth.getUserOrFail()
 
-    await removeAvatarFile(me.avatar)
+    await db.from('user_avatars').where('user_id', me.id).delete()
     me.avatar = null
     await me.save()
 
     session.flash('success', 'Votre photo de profil a été supprimée.')
     return response.redirect().toRoute('profile.edit')
+  }
+
+  /**
+   * Envoie la photo de profil d'un utilisateur
+   */
+  async showAvatar({ params, response }: HttpContext) {
+    const avatar = await db.from('user_avatars').where('user_id', params.id).first()
+
+    if (!avatar) {
+      return response.notFound('Photo introuvable')
+    }
+
+    // L'adresse change à chaque nouvelle photo : le navigateur peut la garder longtemps
+    response.header('Content-Type', avatar.mime_type)
+    response.header('Cache-Control', 'private, max-age=31536000, immutable')
+    response.header('X-Content-Type-Options', 'nosniff')
+    return response.send(avatar.data)
   }
 }

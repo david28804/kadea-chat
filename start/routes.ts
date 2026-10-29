@@ -66,6 +66,7 @@ router
     router.get('/profile', [controllers.Profiles, 'edit']).as('profile.edit')
     router.post('/profile', [controllers.Profiles, 'update']).as('profile.update')
     router.post('/profile/password', [controllers.Profiles, 'updatePassword']).as('profile.password')
+    router.get('/avatars/:id', [controllers.Profiles, 'showAvatar']).as('avatars.show')
     router.post('/profile/avatar', [controllers.Profiles, 'updateAvatar']).as('profile.avatar')
     router
       .post('/profile/avatar/delete', [controllers.Profiles, 'destroyAvatar'])

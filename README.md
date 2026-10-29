@@ -93,8 +93,8 @@ npm run dev
 
 L'application est disponible sur http://localhost:3333.
 
-Les dossiers des fichiers envoyés (`public/uploads/` pour les photos de profil,
-`storage/uploads/` pour les pièces jointes) existent déjà dans le dépôt ; leur contenu n'est jamais versionné.
+Les photos de profil sont enregistrées dans la base de données. Le dossier des pièces jointes
+(`storage/uploads/`) existe déjà dans le dépôt ; son contenu n'est jamais versionné.
 
 > **Tester le temps réel** : deux fenêtres du même navigateur partagent la session.
 > Utilisez deux navigateurs différents (ex. Opera et Edge) ou une fenêtre privée.
@@ -144,6 +144,7 @@ erDiagram
     users ||--o{ conversation_members : participe
     users ||--o{ messages : envoie
     users ||--o{ blocked_users : bloque
+    users ||--o| user_avatars : affiche
     conversations ||--o{ conversation_members : contient
     conversations ||--o{ messages : contient
     messages ||--o{ message_attachments : joint
@@ -200,6 +201,12 @@ erDiagram
         int blocker_id FK
         int blocked_id FK
     }
+    user_avatars {
+        int user_id PK
+        bytea data
+        string mime_type
+        timestamptz updated_at
+    }
 ```
 
 | Table | Rôle |
@@ -211,6 +218,7 @@ erDiagram
 | `messages` | Messages ; suppression logique via `deleted_at`, date de modification dans `edited_at` |
 | `message_attachments` | Fichiers joints (images et documents, 5 Mo maximum) |
 | `blocked_users` | Relations de blocage |
+| `user_avatars` | Photos de profil (image recadrée) ; `users.avatar` garde leur adresse `avatars/:id?v=…`, qui change à chaque nouvelle photo |
 
 Une table `message_reads` a existé au début du projet ; elle n'a jamais servi et une migration la supprime.
 
@@ -233,9 +241,8 @@ start/
   routes.ts      routes et middlewares
   transmit.ts    autorisations des canaux temps réel
 tests/
-  functional/    tests de l'authentification, des conversations et des groupes
+  functional/    tests de l'authentification, des conversations, des groupes et du profil
   helpers.ts     création de comptes, conversations et messages pour les tests
-public/uploads/  photos de profil (contenu non versionné)
 storage/uploads/ pièces jointes (contenu non versionné)
 ```
 
@@ -268,7 +275,7 @@ grâce au fichier `render.yaml` (Blueprint), qui crée le service web et la base
 Limites de l'offre gratuite :
 
 - Le serveur s'endort après 15 minutes sans visite ; la première visite suivante prend environ une minute.
-- Les fichiers envoyés (`public/uploads/`, `storage/uploads/`) ne sont pas conservés lors d'un redéploiement ou d'un redémarrage : il faudrait un disque persistant (offre payante) ou un stockage externe.
+- Le disque du serveur est effacé à chaque redéploiement ou redémarrage. C'est pourquoi les photos de profil sont enregistrées dans la base de données. Les pièces jointes (`storage/uploads/`), elles, sont encore sur le disque : il faudrait un disque persistant (offre payante) ou un stockage externe.
 - La base PostgreSQL gratuite expire au bout de 30 jours.
 - La présence en ligne est gardée en mémoire : une seule instance du serveur.
 
