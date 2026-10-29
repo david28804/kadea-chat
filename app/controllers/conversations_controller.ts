@@ -220,7 +220,7 @@ export default class ConversationsController {
       title,
       initials: initialsOf(title),
       isGroup: conversation.isGroup,
-      subtitle: conversation.isGroup ? `${conversation.members.length} membres` : (other?.user.email ?? ''),
+      subtitle: conversation.isGroup ? `${conversation.members.length} membres` : '',
       otherId: conversation.isGroup ? null : (other?.userId ?? null),
       avatar: conversation.isGroup ? null : (other?.user.avatar ?? null),
       blockedByMe,
@@ -346,7 +346,6 @@ export default class ConversationsController {
       return {
         id: person.id,
         name,
-        email: person.email,
         initials: initialsOf(name),
         avatar: person.avatar ?? null,
       }

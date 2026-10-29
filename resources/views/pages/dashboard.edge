@@ -170,7 +170,9 @@
           </span>
           <span class="chathead__text">
             <span class="conv__name">{{ active.title }}</span>
-            <span class="conv__preview">{{ active.subtitle }}</span>
+            @if(active.subtitle)
+              <span class="conv__preview">{{ active.subtitle }}</span>
+            @end
           </span>
           {{-- Recherche dans la conversation : la loupe déplie le champ --}}
           <form
@@ -320,7 +322,7 @@
                         @each(person in addable)
                           <label
                             class="person"
-                            data-search="{{ `${person.name} ${person.email}`.toLowerCase() }}"
+                            data-search="{{ person.name.toLowerCase() }}"
                             x-show="match($el)"
                           >
                             <input type="checkbox" name="members" value="{{ person.id }}" />
@@ -333,7 +335,6 @@
                             </span>
                             <span class="person__text">
                               <span class="conv__name">{{ person.name }}</span>
-                              <span class="conv__preview">{{ person.email }}</span>
                             </span>
                           </label>
                         @end
@@ -644,7 +645,7 @@
                 <button
                   type="submit"
                   class="person"
-                  data-search="{{ `${person.name} ${person.email}`.toLowerCase() }}"
+                  data-search="{{ person.name.toLowerCase() }}"
                   x-show="match($el)"
                 >
                   <span class="conv__avatar">
@@ -656,7 +657,6 @@
                   </span>
                   <span class="person__text">
                     <span class="conv__name">{{ person.name }}</span>
-                    <span class="conv__preview">{{ person.email }}</span>
                   </span>
                 </button>
               @end
@@ -686,7 +686,7 @@
               @each(person in people)
                 <label
                   class="person"
-                  data-search="{{ `${person.name} ${person.email}`.toLowerCase() }}"
+                  data-search="{{ person.name.toLowerCase() }}"
                   x-show="match($el)"
                 >
                   <input type="checkbox" name="members" value="{{ person.id }}" />
@@ -699,7 +699,6 @@
                   </span>
                   <span class="person__text">
                     <span class="conv__name">{{ person.name }}</span>
-                    <span class="conv__preview">{{ person.email }}</span>
                   </span>
                 </label>
               @else
