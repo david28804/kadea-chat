@@ -170,7 +170,13 @@
           </span>
           <span class="chathead__text">
             <span class="conv__name">{{ active.title }}</span>
-            @if(active.subtitle)
+            @if(!active.isGroup && active.otherId)
+              <span
+                class="conv__preview chathead__status {{ active.online ? 'is-online' : '' }}"
+                data-presence-user="{{ active.otherId }}"
+                data-presence-label
+              >{{ active.online ? 'En ligne' : 'Hors ligne' }}</span>
+            @elseif(active.subtitle)
               <span class="conv__preview">{{ active.subtitle }}</span>
             @end
           </span>

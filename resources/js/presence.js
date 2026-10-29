@@ -14,11 +14,14 @@ if (shell && transmit) {
     }).catch(() => {})
   }
 
-  // Allume ou éteint la pastille de la personne concernée
+  // Allume ou éteint la pastille de la personne concernée (et son statut sous le nom)
   const setOnline = (userId, online) => {
-    document
-      .querySelectorAll(`[data-presence-user="${userId}"]`)
-      .forEach((element) => element.classList.toggle('is-online', online))
+    document.querySelectorAll(`[data-presence-user="${userId}"]`).forEach((element) => {
+      element.classList.toggle('is-online', online)
+      if (element.hasAttribute('data-presence-label')) {
+        element.textContent = online ? 'En ligne' : 'Hors ligne'
+      }
+    })
   }
 
   const subscription = transmit.subscription('presence')

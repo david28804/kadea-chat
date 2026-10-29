@@ -960,6 +960,11 @@ label.person {
   border: 2px solid var(--card);
 }
 
+/* Statut sous le nom, en haut de la conversation */
+.chathead__status.is-online {
+  color: #3ecf8e;
+}
+
 
 /* ==========================================================================
    « Est en train d'écrire »
