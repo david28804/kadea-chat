@@ -74,3 +74,11 @@ router
     router.post('logout', [controllers.Session, 'destroy'])
   })
   .use(middleware.auth())
+
+// Partie admin : réservée aux adresses listées dans ADMIN_EMAILS
+router
+  .group(() => {
+    router.get('/admin', [controllers.Admin, 'index']).as('admin.index')
+    router.post('/admin/users/:id/delete', [controllers.Admin, 'destroy']).as('admin.users.destroy')
+  })
+  .use([middleware.auth(), middleware.admin()])

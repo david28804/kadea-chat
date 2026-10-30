@@ -37,9 +37,12 @@ export type ScannedRoutes = {
     'profile.edit': { paramsTuple?: []; params?: {} }
     'profile.update': { paramsTuple?: []; params?: {} }
     'profile.password': { paramsTuple?: []; params?: {} }
+    'avatars.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.avatar': { paramsTuple?: []; params?: {} }
     'profile.avatar.destroy': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'admin.index': { paramsTuple?: []; params?: {} }
+    'admin.users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -54,6 +57,8 @@ export type ScannedRoutes = {
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.edit': { paramsTuple?: []; params?: {} }
+    'avatars.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -68,6 +73,8 @@ export type ScannedRoutes = {
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'attachments.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profile.edit': { paramsTuple?: []; params?: {} }
+    'avatars.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -94,6 +101,7 @@ export type ScannedRoutes = {
     'profile.avatar': { paramsTuple?: []; params?: {} }
     'profile.avatar.destroy': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
+    'admin.users.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

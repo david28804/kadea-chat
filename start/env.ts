@@ -34,4 +34,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_USERNAME: Env.schema.string.optional(),
   SMTP_PASSWORD: Env.schema.string.optional(),
   BREVO_API_KEY: Env.schema.string.optional(),
+
+  // Adresses e-mail des administrateurs, séparées par des virgules
+  ADMIN_EMAILS: Env.schema.string.optional(),
 })

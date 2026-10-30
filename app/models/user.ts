@@ -7,8 +7,19 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 import EmailToken from '#models/email_token'
 import ConversationMember from '#models/conversation_member'
 import Message from '#models/message'
+import env from '#start/env'
+
+// Les administrateurs sont désignés par leur adresse dans ADMIN_EMAILS
+const ADMIN_EMAILS = (env.get('ADMIN_EMAILS') ?? '')
+  .split(',')
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean)
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
+  get isAdmin() {
+    return ADMIN_EMAILS.includes(this.email.toLowerCase())
+  }
+
   @hasMany(() => EmailToken)
   declare emailTokens: HasMany<typeof EmailToken>
 

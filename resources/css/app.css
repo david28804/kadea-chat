@@ -2979,3 +2979,159 @@ body.kc .searchbar {
 .pwfield__toggle span {
   display: grid;
 }
+
+/* ==========================================================================
+   Administration
+   ========================================================================== */
+.newconv__inner.admin {
+  max-width: 980px;
+}
+.admin__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+.admin__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  background: var(--card);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+}
+.admin__label {
+  color: var(--muted);
+  font-size: 13px;
+}
+.admin__value {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.admin__hint {
+  color: var(--subtle);
+  font-size: 12.5px;
+}
+.admin__panel {
+  margin-top: 20px;
+  padding: 20px;
+}
+.admin__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.admin__count {
+  margin-left: 6px;
+  color: var(--subtle);
+  font-weight: 400;
+}
+.admin__search {
+  flex: 0 1 320px;
+}
+.admin__row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) 1fr 1.1fr 0.9fr 0.8fr 0.8fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+}
+.admin__row:last-child {
+  border-bottom: 0;
+}
+.admin__row--head {
+  color: var(--subtle);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.admin__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.admin__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.admin__badge {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+.admin__tag {
+  color: var(--muted);
+}
+.admin__tag--online {
+  color: #3ecf8e;
+}
+.admin__tag--pending {
+  color: #e0a43c;
+}
+.admin__delete {
+  border-color: rgba(255, 110, 110, 0.4);
+  background: rgba(255, 80, 80, 0.08);
+  color: #ff8585;
+  cursor: pointer;
+}
+.admin__delete:hover {
+  border-color: rgba(255, 110, 110, 0.7);
+  background: rgba(255, 80, 80, 0.16);
+}
+.admin__pages {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.admin__empty {
+  padding: 24px 0 8px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .admin__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin__search {
+    flex-basis: auto;
+  }
+  /* Sur téléphone, chaque utilisateur devient une carte */
+  .admin__row--head {
+    display: none;
+  }
+  .admin__row {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+  }
+  .admin__user {
+    grid-column: 1 / -1;
+    margin-bottom: 4px;
+  }
+  .admin__row > [data-label]::before {
+    content: attr(data-label) ' : ';
+    color: var(--subtle);
+  }
+  .admin__num {
+    text-align: left;
+  }
+}

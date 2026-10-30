@@ -51,6 +51,9 @@ services:
         sync: false
       - key: BREVO_API_KEY
         sync: false
+      # Adresses e-mail des administrateurs, séparées par des virgules
+      - key: ADMIN_EMAILS
+        sync: false
 
 databases:
   - name: kadea-chat-db

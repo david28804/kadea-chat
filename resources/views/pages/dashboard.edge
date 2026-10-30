@@ -16,6 +16,9 @@
           { label: 'Contacts', step: 'private', icon: 'lucide:user-plus' },
           { label: 'Groupes', step: 'group', icon: 'lucide:users' },
           { label: 'Paramètres', route: 'profile.edit', icon: 'lucide:settings' },
+          ...(auth.user?.isAdmin
+            ? [{ label: 'Administration', route: 'admin.index', icon: 'lucide:shield' }]
+            : []),
         ])
         <nav class="convnav" aria-label="Navigation principale">
           @each(item in nav)

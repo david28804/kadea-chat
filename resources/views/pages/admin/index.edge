@@ -1,0 +1,138 @@
+@layouts.app({ title: 'Administration' })
+  <div class="newconv">
+    <div class="newconv__inner admin">
+      <a href="{{ route('dashboard') }}" class="il newconv__back">← Retour aux conversations</a>
+      <h1 class="newconv__title">Administration</h1>
+      <p class="newconv__sub">Vue d'ensemble de Kadea Chat et de ses utilisateurs.</p>
+
+      {{-- Chiffres clés --}}
+      <div class="admin__stats">
+        <div class="admin__stat">
+          <span class="admin__label">Utilisateurs</span>
+          <span class="admin__value">{{ stats.users }}</span>
+          <span class="admin__hint">{{ stats.confirmed }} confirmés · {{ stats.pending }} en attente</span>
+        </div>
+        <div class="admin__stat">
+          <span class="admin__label">En ligne</span>
+          <span class="admin__value">{{ stats.online }}</span>
+          <span class="admin__hint">en ce moment</span>
+        </div>
+        <div class="admin__stat">
+          <span class="admin__label">Conversations</span>
+          <span class="admin__value">{{ stats.privates + stats.groups }}</span>
+          <span class="admin__hint">{{ stats.privates }} privées · {{ stats.groups }} groupes</span>
+        </div>
+        <div class="admin__stat">
+          <span class="admin__label">Messages</span>
+          <span class="admin__value">{{ stats.messages }}</span>
+          <span class="admin__hint">{{ stats.files }} fichiers partagés</span>
+        </div>
+      </div>
+
+      {{-- Liste des utilisateurs --}}
+      <div class="panel admin__panel">
+        <div class="admin__head">
+          <h2 class="section__title">
+            Utilisateurs
+            <span class="admin__count">{{ pagination.total }}</span>
+          </h2>
+          <form method="GET" action="{{ route('admin.index') }}" class="admin__search" role="search">
+            <input
+              type="search"
+              name="q"
+              value="{{ search }}"
+              placeholder="Rechercher un nom ou une adresse e-mail"
+              class="field__input"
+              aria-label="Rechercher un utilisateur"
+            />
+          </form>
+        </div>
+
+        @if(people.length)
+          <div class="admin__table" role="table" aria-label="Utilisateurs">
+            <div class="admin__row admin__row--head" role="row">
+              <span role="columnheader">Utilisateur</span>
+              <span role="columnheader">Inscription</span>
+              <span role="columnheader">Statut</span>
+              <span role="columnheader" class="admin__num">Conversations</span>
+              <span role="columnheader" class="admin__num">Messages</span>
+              <span role="columnheader">Actions</span>
+            </div>
+            @each(person in people)
+              <div class="admin__row" role="row">
+                <span class="admin__user" role="cell">
+                  <span class="conv__avatar {{ person.online ? 'is-online' : '' }}">
+                    @if(person.avatar)
+                      <img src="/{{ person.avatar }}" alt="" class="conv__img" />
+                    @else
+                      {{ person.initials }}
+                    @end
+                  </span>
+                  <span class="person__text">
+                    <span class="conv__name">
+                      {{ person.name }}
+                      @if(person.isAdmin)
+                        <span class="admin__badge">Admin</span>
+                      @end
+                    </span>
+                    <span class="conv__preview">{{ person.email }}</span>
+                  </span>
+                </span>
+                <span role="cell" data-label="Inscription">{{ person.joinedAt }}</span>
+                <span role="cell" data-label="Statut">
+                  @if(!person.confirmed)
+                    <span class="admin__tag admin__tag--pending">E-mail non confirmé</span>
+                  @elseif(person.online)
+                    <span class="admin__tag admin__tag--online">En ligne</span>
+                  @else
+                    <span class="admin__tag">Hors ligne</span>
+                  @end
+                </span>
+                <span role="cell" class="admin__num" data-label="Conversations">{{ person.conversations }}</span>
+                <span role="cell" class="admin__num" data-label="Messages">{{ person.messages }}</span>
+                <span role="cell" data-label="Actions">
+                  @if(!person.canDelete)
+                    <span class="admin__tag">Votre compte</span>
+                  @else
+                    @form({
+                      route: 'admin.users.destroy',
+                      routeParams: { id: person.id },
+                      method: 'POST',
+                      onsubmit: "return confirm('Supprimer définitivement ce compte ? Les messages dans les conversations partagées seront conservés.')",
+                    })
+                      <button type="submit" class="btn btn--sm admin__delete">Supprimer</button>
+                    @end
+                  @end
+                </span>
+              </div>
+            @end
+          </div>
+
+          @if(pagination.lastPage > 1)
+            <nav class="admin__pages" aria-label="Pages">
+              @if(pagination.previousUrl)
+                <a href="{{ pagination.previousUrl }}" class="il">← Précédent</a>
+              @else
+                <span></span>
+              @end
+              <span>Page {{ pagination.currentPage }} sur {{ pagination.lastPage }}</span>
+              @if(pagination.nextUrl)
+                <a href="{{ pagination.nextUrl }}" class="il">Suivant →</a>
+              @else
+                <span></span>
+              @end
+            </nav>
+          @end
+        @else
+          <p class="admin__empty">
+            @if(search)
+              Aucun utilisateur ne correspond à « {{ search }} ».
+            @else
+              Aucun utilisateur pour le moment.
+            @end
+          </p>
+        @end
+      </div>
+    </div>
+  </div>
+@end

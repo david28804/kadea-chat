@@ -22,6 +22,10 @@ export default class PresenceService {
     return state.online.has(userId)
   }
 
+  static onlineCount() {
+    return state.online.size
+  }
+
   /**
    * Enregistre un signe de vie. Annonce l'arrivée si la personne était absente.
    */
@@ -31,6 +35,14 @@ export default class PresenceService {
     if (!state.online.has(userId)) {
       state.online.add(userId)
       transmit.broadcast('presence', { userId, online: true })
+    }
+  }
+
+  static remove(userId: number) {
+    state.lastSeen.delete(userId)
+
+    if (state.online.delete(userId)) {
+      transmit.broadcast('presence', { userId, online: false })
     }
   }
 }

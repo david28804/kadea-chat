@@ -56,6 +56,12 @@
 - Photo de profil avec recadrage circulaire
 - Thème crème et noir, en mode sombre (par défaut) ou clair, mémorisé pour tout le site
 
+**Administration**
+- Page `/admin` réservée aux adresses listées dans `ADMIN_EMAILS` (introuvable pour les autres)
+- Chiffres clés : utilisateurs (confirmés / en attente), personnes en ligne, conversations, messages, fichiers
+- Liste de tous les utilisateurs avec recherche par nom ou adresse : date d'inscription, statut, nombre de conversations et de messages
+- Suppression des comptes depuis l'administration, avec confirmation ; le compte connecté ne peut pas être supprimé
+
 ## Technologies
 
 | Domaine | Outil |
@@ -117,6 +123,7 @@ node ace test
 | `tests/functional/auth.spec.ts` | Inscription et envoi de l'e-mail, connexion refusée sans e-mail confirmé, connexion, mauvais mot de passe, pages protégées, déconnexion |
 | `tests/functional/conversations.spec.ts` | Accès et écriture refusés aux non-membres, une seule conversation privée par paire, recherche de messages limitée à ses conversations, recherche dans une conversation, modification réservée à l'auteur |
 | `tests/functional/groups.spec.ts` | Création, ajout et retrait réservés aux administrateurs, passage du rôle d'administrateur, suppression du groupe vide |
+| `tests/functional/admin.spec.ts` | Accès réservé aux administrateurs, recherche des utilisateurs, suppression de comptes et préservation de l'historique partagé |
 
 Les tests peuvent tourner pendant que `npm run dev` est lancé : ils ont leur propre cache Vite.
 
@@ -132,11 +139,15 @@ Les tests peuvent tourner pendant que `npm run dev` est lancé : ils ont leur pr
 | `MAIL_MAILER` | `brevo` (API Brevo) ou `smtp` (Mailtrap ou autre serveur SMTP) |
 | `MAIL_FROM_NAME`, `MAIL_FROM_ADDRESS` | Expéditeur des e-mails (avec Brevo, l'adresse doit être validée dans le compte Brevo) |
 | `BREVO_API_KEY` | Clé API Brevo, utilisée quand `MAIL_MAILER=brevo` |
+| `ADMIN_EMAILS` | Adresses des administrateurs, séparées par des virgules (accès à `/admin`) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Serveur SMTP, utilisé quand `MAIL_MAILER=smtp` |
 
 Le fichier `.env` n'est jamais versionné ; `.env.example` sert de modèle.
 
 ## Schéma de base de données
+
+La modélisation complète selon Merise (règles de gestion, dictionnaire des données, MCD, MLD et MPD)
+se trouve dans [docs/MERISE.md](docs/MERISE.md).
 
 ```mermaid
 erDiagram
@@ -264,9 +275,10 @@ L'application est déployée sur [Render](https://render.com) à l'adresse https
 grâce au fichier `render.yaml` (Blueprint), qui crée le service web et la base PostgreSQL.
 
 1. Sur Render : **New → Blueprint**, puis choisir le dépôt `kadea-chat`.
-2. Renseigner les deux valeurs demandées :
+2. Renseigner les valeurs demandées :
    - `MAIL_FROM_ADDRESS` : adresse d'expédition validée dans Brevo ;
-   - `BREVO_API_KEY` : clé API Brevo.
+   - `BREVO_API_KEY` : clé API Brevo ;
+   - `ADMIN_EMAILS` : adresses des administrateurs.
 3. Lancer le déploiement. À chaque démarrage, les migrations sont appliquées automatiquement.
 
 `APP_KEY` est générée par Render, et `APP_URL` prend l'adresse publique du service
@@ -294,5 +306,6 @@ Limites de l'offre gratuite :
 | Gestion de groupe (ajout, retrait, quitter) | Terminé |
 | Recherche (liste et conversation) | Terminé |
 | Profil, photo recadrée, thème sombre / clair | Terminé |
+| Partie administration (tableau de bord, liste des utilisateurs) | Terminé |
 | Tests automatiques | Terminé |
 | Déploiement (Render) | Configuré |
