@@ -3080,6 +3080,11 @@ body.kc .searchbar {
 .admin__tag--pending {
   color: #e0a43c;
 }
+.admin__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 .admin__delete {
   border-color: rgba(255, 110, 110, 0.4);
   background: rgba(255, 80, 80, 0.08);

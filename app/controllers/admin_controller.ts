@@ -1,6 +1,8 @@
 import User from '#models/user'
 import PresenceService from '#services/presence_service'
 import db from '@adonisjs/lucid/services/db'
+import transmit from '@adonisjs/transmit/services/main'
+import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 
 const PER_PAGE = 20
@@ -134,6 +136,56 @@ export default class AdminController {
 
     PresenceService.remove(user.id)
     session.flash('success', `${user.fullName ?? user.email} a été supprimé(e).`)
+    return response.redirect().toRoute('admin.index')
+  }
+
+  /**
+   * Supprime tous les messages d'un utilisateur, comme s'il les avait supprimés lui-même
+   */
+  async destroyMessages({ params, response, session }: HttpContext) {
+    const userId = Number(params.id)
+
+    if (!Number.isInteger(userId)) {
+      session.flash('error', 'Utilisateur invalide.')
+      return response.redirect().toRoute('admin.index')
+    }
+
+    const user = await User.find(userId)
+    if (!user) {
+      session.flash('error', 'Utilisateur introuvable.')
+      return response.redirect().toRoute('admin.index')
+    }
+
+    if (user.isAdmin) {
+      session.flash(
+        'error',
+        "Les messages d'un administrateur ne peuvent pas être supprimés depuis cette page."
+      )
+      return response.redirect().toRoute('admin.index')
+    }
+
+    const messages: { id: number; conversation_id: number }[] = await db
+      .from('messages')
+      .where('sender_id', user.id)
+      .whereNull('deleted_at')
+      .update({ deleted_at: DateTime.now().toJSDate(), content: null })
+      .returning(['id', 'conversation_id'])
+
+    // Les conversations ouvertes affichent aussitôt « message supprimé »
+    for (const message of messages) {
+      transmit.broadcast(`conversations/${message.conversation_id}`, {
+        type: 'deleted',
+        id: message.id,
+      })
+    }
+
+    const name = user.fullName ?? user.email
+    session.flash(
+      'success',
+      messages.length
+        ? `${messages.length} message(s) de ${name} supprimé(s).`
+        : `${name} n'a aucun message à supprimer.`
+    )
     return response.redirect().toRoute('admin.index')
   }
 }

@@ -97,6 +97,57 @@ test.group('Administration', (group) => {
     assert.isNotNull(membership)
   })
 
+  test("l'administrateur peut supprimer tous les messages d'un utilisateur", async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdmin()
+    const user = await createUser('Awa Diallo')
+    const other = await createUser('Ben Kasongo')
+    const conversation = await createPrivate(user, other)
+    const first = await postMessage(conversation, user, 'Premier message')
+    const second = await postMessage(conversation, user, 'Second message')
+    const reply = await postMessage(conversation, other, 'Réponse conservée')
+
+    const response = await client
+      .post(`/admin/users/${user.id}/messages/delete`)
+      .loginAs(admin)
+      .withCsrfToken()
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/admin')
+    for (const message of [first, second]) {
+      const deleted = await Message.findOrFail(message.id)
+      assert.isNotNull(deleted.deletedAt)
+      assert.isNull(deleted.content)
+    }
+    const kept = await Message.findOrFail(reply.id)
+    assert.isNull(kept.deletedAt)
+    assert.equal(kept.content, 'Réponse conservée')
+    assert.isNotNull(await User.find(user.id))
+  })
+
+  test("un utilisateur simple ne peut pas supprimer les messages d'un autre", async ({
+    client,
+    assert,
+  }) => {
+    const user = await createUser()
+    const target = await createUser('Awa Diallo')
+    const conversation = await createPrivate(user, target)
+    const message = await postMessage(conversation, target, 'Message conservé')
+
+    const response = await client
+      .post(`/admin/users/${target.id}/messages/delete`)
+      .loginAs(user)
+      .withCsrfToken()
+      .redirects(0)
+
+    response.assertStatus(404)
+    const kept = await Message.findOrFail(message.id)
+    assert.isNull(kept.deletedAt)
+  })
+
   test("l'administrateur ne peut pas supprimer son propre compte", async ({ client, assert }) => {
     const admin = await createAdmin()
 

@@ -80,5 +80,8 @@ router
   .group(() => {
     router.get('/admin', [controllers.Admin, 'index']).as('admin.index')
     router.post('/admin/users/:id/delete', [controllers.Admin, 'destroy']).as('admin.users.destroy')
+    router
+      .post('/admin/users/:id/messages/delete', [controllers.Admin, 'destroyMessages'])
+      .as('admin.users.messages.destroy')
   })
   .use([middleware.auth(), middleware.admin()])

@@ -94,14 +94,26 @@
                   @if(!person.canDelete)
                     <span class="admin__tag">Votre compte</span>
                   @else
-                    @form({
-                      route: 'admin.users.destroy',
-                      routeParams: { id: person.id },
-                      method: 'POST',
-                      onsubmit: "return confirm('Supprimer définitivement ce compte ? Les messages dans les conversations partagées seront conservés.')",
-                    })
-                      <button type="submit" class="btn btn--sm admin__delete">Supprimer</button>
-                    @end
+                    <span class="admin__actions">
+                      @if(person.messages && !person.isAdmin)
+                        @form({
+                          route: 'admin.users.messages.destroy',
+                          routeParams: { id: person.id },
+                          method: 'POST',
+                          onsubmit: "return confirm('Supprimer tous les messages de cet utilisateur ? Ils seront remplacés par « message supprimé » dans les conversations.')",
+                        })
+                          <button type="submit" class="btn btn--sm admin__delete">Supprimer les messages</button>
+                        @end
+                      @end
+                      @form({
+                        route: 'admin.users.destroy',
+                        routeParams: { id: person.id },
+                        method: 'POST',
+                        onsubmit: "return confirm('Supprimer définitivement ce compte ? Les messages dans les conversations partagées seront conservés.')",
+                      })
+                        <button type="submit" class="btn btn--sm admin__delete">Supprimer le compte</button>
+                      @end
+                    </span>
                   @end
                 </span>
               </div>

@@ -61,6 +61,7 @@
 - Chiffres clés : utilisateurs (confirmés / en attente), personnes en ligne, conversations, messages, fichiers
 - Liste de tous les utilisateurs avec recherche par nom ou adresse : date d'inscription, statut, nombre de conversations et de messages
 - Suppression des comptes depuis l'administration, avec confirmation ; le compte connecté ne peut pas être supprimé
+- Suppression de tous les messages d'un utilisateur, avec confirmation : ils apparaissent comme « message supprimé », en direct dans les conversations ouvertes
 
 ## Technologies
 
