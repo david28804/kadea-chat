@@ -129,7 +129,7 @@ export class UserAvatarSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatar', 'createdAt', 'email', 'emailVerifiedAt', 'fullName', 'id', 'password', 'updatedAt'] as const
+  static $columns = ['avatar', 'createdAt', 'email', 'emailVerifiedAt', 'fullName', 'id', 'password', 'sessionsRevokedAt', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatar: string | null
@@ -145,6 +145,8 @@ export class UserSchema extends BaseModel {
   declare id: number
   @column({ serializeAs: null })
   declare password: string
+  @column.dateTime()
+  declare sessionsRevokedAt: DateTime | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

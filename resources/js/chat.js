@@ -67,6 +67,12 @@ if (box && transmit && box.dataset.live === '1') {
       return
     }
 
+    // Un administrateur a effacé le message : il disparaît complètement
+    if (data.type === 'removed') {
+      box.querySelector(`[data-message-id="${data.id}"]`)?.remove()
+      return
+    }
+
     // L'autre personne a lu la conversation : mes coches passent en « lu »
     if (data.type === 'read') {
       if (!isGroup && data.userId !== myId) {

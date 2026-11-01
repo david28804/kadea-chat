@@ -50,6 +50,8 @@ export default class SessionController {
     }
 
     await auth.use('web').login(user)
+    // Comparée à sessionsRevokedAt quand un administrateur déconnecte l'utilisateur
+    session.put('logged_in_at', Date.now())
     return response.redirect().toRoute('dashboard')
   }
 

@@ -5,13 +5,20 @@ const shell = document.querySelector('.shell')
 if (shell && transmit) {
   const token = document.querySelector('meta[name="csrf-token"]')?.content ?? ''
 
-  // Signe de vie envoyé au serveur
+  // Signe de vie envoyé au serveur ; s'il renvoie vers la connexion,
+  // la session n'est plus valable (déconnexion par un administrateur)
   const ping = () => {
     fetch('/presence/ping', {
       method: 'POST',
       headers: { 'X-CSRF-TOKEN': token },
       credentials: 'same-origin',
-    }).catch(() => {})
+    })
+      .then((response) => {
+        if (response.redirected && new URL(response.url).pathname === '/login') {
+          window.location.href = '/login'
+        }
+      })
+      .catch(() => {})
   }
 
   // Allume ou éteint la pastille de la personne concernée (et son statut sous le nom)

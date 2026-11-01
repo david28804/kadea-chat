@@ -100,7 +100,7 @@
                           route: 'admin.users.messages.destroy',
                           routeParams: { id: person.id },
                           method: 'POST',
-                          onsubmit: "return confirm('Supprimer tous les messages de cet utilisateur ? Ils seront remplacés par « message supprimé » dans les conversations.')",
+                          onsubmit: "return confirm('Effacer définitivement tous les messages de cet utilisateur ? Il sera aussi déconnecté et devra se reconnecter.')",
                         })
                           <button type="submit" class="btn btn--sm admin__delete">Supprimer les messages</button>
                         @end

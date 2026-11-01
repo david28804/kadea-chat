@@ -117,15 +117,28 @@ test.group('Administration', (group) => {
 
     response.assertStatus(302)
     response.assertHeader('location', '/admin')
-    for (const message of [first, second]) {
-      const deleted = await Message.findOrFail(message.id)
-      assert.isNotNull(deleted.deletedAt)
-      assert.isNull(deleted.content)
-    }
+    assert.isNull(await Message.find(first.id))
+    assert.isNull(await Message.find(second.id))
     const kept = await Message.findOrFail(reply.id)
-    assert.isNull(kept.deletedAt)
     assert.equal(kept.content, 'Réponse conservée')
     assert.isNotNull(await User.find(user.id))
+
+    // La session ouverte avant la suppression n'est plus valable
+    const before = await client
+      .get('/dashboard')
+      .loginAs(user)
+      .withSession({ logged_in_at: Date.now() - 60_000 })
+      .redirects(0)
+    before.assertStatus(302)
+    before.assertHeader('location', '/login')
+
+    // Une nouvelle connexion fonctionne
+    const after = await client
+      .get('/dashboard')
+      .loginAs(user)
+      .withSession({ logged_in_at: Date.now() + 1000 })
+      .redirects(0)
+    after.assertStatus(200)
   })
 
   test("un utilisateur simple ne peut pas supprimer les messages d'un autre", async ({

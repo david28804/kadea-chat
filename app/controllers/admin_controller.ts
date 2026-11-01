@@ -1,8 +1,10 @@
+import app from '@adonisjs/core/services/app'
 import User from '#models/user'
 import PresenceService from '#services/presence_service'
 import db from '@adonisjs/lucid/services/db'
 import transmit from '@adonisjs/transmit/services/main'
 import { DateTime } from 'luxon'
+import { rm } from 'node:fs/promises'
 import type { HttpContext } from '@adonisjs/core/http'
 
 const PER_PAGE = 20
@@ -140,7 +142,8 @@ export default class AdminController {
   }
 
   /**
-   * Supprime tous les messages d'un utilisateur, comme s'il les avait supprimés lui-même
+   * Efface définitivement tous les messages d'un utilisateur (et leurs fichiers),
+   * puis le déconnecte : il devra se reconnecter
    */
   async destroyMessages({ params, response, session }: HttpContext) {
     const userId = Number(params.id)
@@ -164,17 +167,33 @@ export default class AdminController {
       return response.redirect().toRoute('admin.index')
     }
 
+    const files: { stored_name: string }[] = await db
+      .from('message_attachments')
+      .join('messages', 'messages.id', 'message_attachments.message_id')
+      .where('messages.sender_id', user.id)
+      .select('message_attachments.stored_name')
+
+    // Les pièces jointes sont supprimées avec leur message (ON DELETE CASCADE)
     const messages: { id: number; conversation_id: number }[] = await db
       .from('messages')
       .where('sender_id', user.id)
-      .whereNull('deleted_at')
-      .update({ deleted_at: DateTime.now().toJSDate(), content: null })
+      .delete()
       .returning(['id', 'conversation_id'])
 
-    // Les conversations ouvertes affichent aussitôt « message supprimé »
+    user.sessionsRevokedAt = DateTime.now()
+    await user.save()
+    PresenceService.remove(user.id)
+
+    await Promise.all(
+      files.map((file) =>
+        rm(app.makePath('storage/uploads/messages', file.stored_name), { force: true })
+      )
+    )
+
+    // Les messages disparaissent aussitôt des conversations ouvertes
     for (const message of messages) {
       transmit.broadcast(`conversations/${message.conversation_id}`, {
-        type: 'deleted',
+        type: 'removed',
         id: message.id,
       })
     }
@@ -182,9 +201,7 @@ export default class AdminController {
     const name = user.fullName ?? user.email
     session.flash(
       'success',
-      messages.length
-        ? `${messages.length} message(s) de ${name} supprimé(s).`
-        : `${name} n'a aucun message à supprimer.`
+      `${messages.length} message(s) de ${name} supprimé(s) ; ${name} a été déconnecté(e).`
     )
     return response.redirect().toRoute('admin.index')
   }
