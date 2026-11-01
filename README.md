@@ -60,7 +60,7 @@
 - Page `/admin` réservée aux adresses listées dans `ADMIN_EMAILS` (introuvable pour les autres)
 - Chiffres clés : utilisateurs (confirmés / en attente), personnes en ligne, conversations, messages, fichiers
 - Liste de tous les utilisateurs avec recherche par nom ou adresse : date d'inscription, statut, nombre de conversations et de messages
-- Suppression des comptes depuis l'administration, avec confirmation ; le compte connecté ne peut pas être supprimé
+- Suppression des comptes depuis l'administration, avec confirmation : leurs conversations privées sont supprimées, leurs messages dans les groupes sont conservés ; le compte connecté ne peut pas être supprimé
 - Suppression définitive de tous les messages d'un utilisateur et de leurs fichiers, avec confirmation : ils disparaissent des conversations (en direct si elles sont ouvertes), et l'utilisateur est déconnecté jusqu'à sa prochaine connexion
 
 ## Technologies

@@ -2,7 +2,8 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import User from '#models/user'
 import { DateTime } from 'luxon'
-import { createPrivate, createUser, PASSWORD, postMessage } from '#tests/helpers'
+import { createGroup, createPrivate, createUser, PASSWORD, postMessage } from '#tests/helpers'
+import Conversation from '#models/conversation'
 import ConversationMember from '#models/conversation_member'
 import Message from '#models/message'
 
@@ -71,14 +72,17 @@ test.group('Administration', (group) => {
     assert.notInclude(response.text(), 'Awa Diallo')
   })
 
-  test("l'administrateur peut supprimer un utilisateur sans effacer l'historique partagé", async ({
+  test("supprimer un utilisateur supprime ses conversations privées mais garde l'historique des groupes", async ({
     client,
     assert,
   }) => {
     const admin = await createAdmin()
     const user = await createUser('Awa Diallo')
+    const other = await createUser('Ben Kasongo')
     const conversation = await createPrivate(admin, user)
-    const message = await postMessage(conversation, user, 'Message conservé')
+    await postMessage(conversation, user, 'Message privé')
+    const group = await createGroup('Projet', admin, [user, other])
+    const message = await postMessage(group, user, 'Message conservé')
 
     const response = await client
       .post(`/admin/users/${user.id}/delete`)
@@ -89,9 +93,12 @@ test.group('Administration', (group) => {
     response.assertStatus(302)
     response.assertHeader('location', '/admin')
     assert.isNull(await User.find(user.id))
-    assert.isNull((await Message.find(message.id))?.senderId)
+    assert.isNull(await Conversation.find(conversation.id))
+    assert.isNotNull(await Conversation.find(group.id))
+    const kept = await Message.find(message.id)
+    assert.isNull(kept?.senderId)
     const membership = await ConversationMember.query()
-      .where('conversationId', conversation.id)
+      .where('conversationId', group.id)
       .where('userId', admin.id)
       .first()
     assert.isNotNull(membership)

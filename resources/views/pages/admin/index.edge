@@ -109,7 +109,7 @@
                         route: 'admin.users.destroy',
                         routeParams: { id: person.id },
                         method: 'POST',
-                        onsubmit: "return confirm('Supprimer définitivement ce compte ? Les messages dans les conversations partagées seront conservés.')",
+                        onsubmit: "return confirm('Supprimer définitivement ce compte et ses conversations privées ? Ses messages dans les groupes seront conservés.')",
                       })
                         <button type="submit" class="btn btn--sm admin__delete">Supprimer le compte</button>
                       @end

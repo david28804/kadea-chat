@@ -84,7 +84,7 @@ export default class AdminController {
   }
 
   /**
-   * Supprime un compte, sans supprimer les conversations qui ont encore des membres
+   * Supprime un compte et ses conversations privées, sans supprimer les groupes qui ont encore des membres
    */
   async destroy({ auth, params, response, session }: HttpContext) {
     const admin = auth.getUserOrFail()
@@ -119,6 +119,8 @@ export default class AdminController {
 
       await trx.from('users').where('id', user.id).delete()
 
+      // Ses conversations privées disparaissent aussi chez l'autre personne ;
+      // un groupe n'est supprimé que s'il n'a plus de membres
       if (conversations.length) {
         await trx
           .from('conversations')
@@ -126,11 +128,13 @@ export default class AdminController {
             'id',
             conversations.map((conversation) => conversation.conversation_id)
           )
-          .whereNotExists((query) =>
-            query
-              .from('conversation_members')
-              .select('id')
-              .whereColumn('conversation_members.conversation_id', 'conversations.id')
+          .where((query) =>
+            query.where('type', 'private').orWhereNotExists((members) =>
+              members
+                .from('conversation_members')
+                .select('id')
+                .whereColumn('conversation_members.conversation_id', 'conversations.id')
+            )
           )
           .delete()
       }
