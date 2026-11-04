@@ -1950,7 +1950,8 @@ label.person {
 }
 .lauth__brand {
   align-self: flex-start;
-  font-size: 22px;
+  font-size: 20px;
+  white-space: nowrap;
   letter-spacing: -0.03em;
   color: var(--l-cream);
 }
@@ -2194,7 +2195,8 @@ body.kc .newchat {
 /* Titre de la liste, comme le logo de l'accueil */
 body.kc .convlist__title {
   font-weight: 400;
-  font-size: 22px;
+  font-size: 19px;
+  white-space: nowrap;
   letter-spacing: -0.03em;
 }
 body.kc .convlist__title a {
@@ -3142,6 +3144,9 @@ body.kc .searchbar {
 }
 
 /* Logo devant le nom « Kadea Chat » */
+.lnav__brand {
+  white-space: nowrap;
+}
 .brandmark {
   display: inline-block;
   width: 1.15em;
