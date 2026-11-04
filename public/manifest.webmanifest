@@ -1,0 +1,9 @@
+{
+  "name": "Kadea Chat",
+  "short_name": "Kadea Chat",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#B4481E",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

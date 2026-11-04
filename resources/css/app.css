@@ -3140,3 +3140,13 @@ body.kc .searchbar {
     text-align: left;
   }
 }
+
+/* Logo devant le nom « Kadea Chat » */
+.brandmark {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  margin-right: 0.4em;
+  vertical-align: -0.2em;
+  border-radius: 0.25em;
+}

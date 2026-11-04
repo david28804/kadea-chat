@@ -11,6 +11,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#B4481E" />
     <title>Kadea Chat — La messagerie de votre équipe</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,7 +33,7 @@
       x-bind:class="open && 'is-open'"
       x-on:keydown.escape.window="open = false"
     >
-      <a href="/" class="lnav__brand">Kadea Chat<sup>*</sup></a>
+      <a href="/" class="lnav__brand"><img class="brandmark" src="/favicon.svg" alt="" />Kadea Chat<sup>*</sup></a>
       <button
         type="button"
         class="lnav__burger"

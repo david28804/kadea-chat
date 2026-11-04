@@ -12,6 +12,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#B4481E" />
     <title>Kadea Chat</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,7 +28,7 @@
   <body class="landing">
     <div class="lauth">
       <div class="lauth__col">
-        <a href="/" class="lauth__brand">Kadea Chat<sup>*</sup></a>
+        <a href="/" class="lauth__brand"><img class="brandmark" src="/favicon.svg" alt="" />Kadea Chat<sup>*</sup></a>
         <div class="lauth__wrap">{{{ await $slots.main() }}}</div>
         <a href="/" class="lauth__back">
           @svg('lucide:arrow-left', { width: 14, height: 14 })
